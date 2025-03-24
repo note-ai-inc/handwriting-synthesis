@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Handwritten Stroke Renderer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    textarea { width: 100%; }
+    label { font-weight: bold; }
+    input, textarea { margin-bottom: 1em; }
+    svg { border: 1px solid #ccc; margin-top: 1em; background: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Markdown to Handwritten Stroke Renderer</h1>
+  <form id="strokeForm">
+    <label for="markdown">Markdown:</label><br>
+    <textarea id="markdown" name="markdown" rows="5">
+# Sample Document
+Some text here.
+    </textarea><br>
+    <label for="style_id">Style ID:</label>
+    <input type="number" id="style_id" name="style_id" value="8"><br>
+    <button type="submit">Convert and Render</button>
+  </form>
+  
+  <h2>Rendered Strokes:</h2>
+  <div id="svgContainer"></div>
+
+  <script>
+    function getBoundingBox(strokes) {
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      // Iterate over lines and then over each segment's points
+      strokes.forEach(line => {
+        line.strokes.forEach(segment => {
+          segment.forEach(([x, y, eos]) => {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          });
+        });
+      });
+      return { minX, maxX, minY, maxY };
+    }
+  
+    function buildPath(coords) {
+      let path = "";
+      let penUp = true;
+      coords.forEach(([x, y, eos]) => {
+        if (penUp) {
+          path += `M${x},${y} `;
+          penUp = false;
+        } else {
+          path += `L${x},${y} `;
+        }
+        if (eos === 1) {
+          penUp = true;
+        }
+      });
+      return path.trim();
+    }
+  
+    document.getElementById("strokeForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const markdown = document.getElementById("markdown").value;
+      const style_id = parseInt(document.getElementById("style_id").value, 10);
+  
+      try {
+        const resp = await fetch("https://e910-2001-16a2-c014-224f-7b89-dae1-6ef-2ba2.ngrok-free.app/convert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ markdown, style_id })
+        });
+        const result = await resp.json();
+  
+        // Log the stroke data for debugging
+        console.log("Stroke result:", result);
+  
+        // Clear any previous SVG
+        const svgContainer = document.getElementById("svgContainer");
+        svgContainer.innerHTML = "";
+  
+        // Check if stroke data exists
+        if (!result.strokes || result.strokes.length === 0) {
+          return;
+        }
+  
+        // Compute bounding box using the nested strokes
+        const { minX, maxX, minY, maxY } = getBoundingBox(result.strokes);
+        console.log("Bounding box:", { minX, maxX, minY, maxY });
+
+        const width = maxX - minX;
+        const height = maxY - minY;
+  
+        // Create the SVG element
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svgElem = document.createElementNS(svgNS, "svg");
+        svgElem.setAttribute("width", width > 0 ? width : 300);
+        svgElem.setAttribute("height", height > 0 ? height : 200);
+        const pad = 20;
+        svgElem.setAttribute("viewBox", `${minX - pad} ${minY - pad} ${width + pad * 2} ${height + pad * 2}`);
+  
+        // Build and append each stroke segment as a path
+        result.strokes.forEach(lineData => {
+          // Use the stroke_width from the backend, fallback to "2" if not provided.
+          const strokeWidth = lineData.stroke_width || "2";
+          const strokeColor = lineData.stroke_color || "black";
+          
+          if (lineData.strokes && lineData.strokes.length) {
+            lineData.strokes.forEach(segment => {
+              const d = buildPath(segment);
+              console.log("Path data:", d);
+              const pathElem = document.createElementNS(svgNS, "path");
+              pathElem.setAttribute("d", d);
+              pathElem.setAttribute("stroke", strokeColor);
+              pathElem.setAttribute("stroke-width", strokeWidth);
+              pathElem.setAttribute("fill", "none");
+              svgElem.appendChild(pathElem);
+            });
+          }
+        });
+
+        // Append the SVG to the container
+        svgContainer.appendChild(svgElem);
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    });
+  </script>
+  
+
+</body>
+</html>
