@@ -274,6 +274,9 @@ def process_stroke(item, stroke, initial_coord, line_height):
         "stroke_color": sc
     }
 
+@app.get("/health")
+def health():
+    return {"message": "OK"}
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
