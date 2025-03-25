@@ -53,9 +53,9 @@ def parse_markdown(markdown_text):
         line = raw_line.strip()
         line_meta = {"type": "paragraph", "indent": 0}
 
-        if not line:
-            results.append({"line": "", "metadata": line_meta})
-            continue
+        # if not line:
+        #     results.append({"line": "", "metadata": line_meta})
+        #     continue
 
         # Detect header: lines starting with one or more #
         header_match = re.match(r"^(#{1,6})\s+(.*)", line)
@@ -119,7 +119,7 @@ def metadata_to_style(metadata_list, style_id):
     styles = [style_id] * n
     biases = [single_bias] * n
     # Repeat the pattern [2, 2, 2, 2] to match the number of lines
-    pattern = [2, 2, 2, 2]
+    pattern = [1, 1, 1, 1]
     stroke_widths = (pattern * ((n // len(pattern)) + 1))[:n]
     stroke_colors = [single_stroke_color] * n
     return styles, biases, stroke_colors, stroke_widths
