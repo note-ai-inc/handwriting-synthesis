@@ -276,7 +276,12 @@ def process_stroke(item, stroke, initial_coord, line_height):
 
 @app.get("/health")
 def health():
-    return {"message": "OK"}
+    region = os.environ.get('CLOUD_RUN_REGION', 'unknown')
+    return {
+        "message": "OK",
+        "region": region,
+        "instance": os.environ.get('K_REVISION', 'unknown')
+    }
 
 @app.get("/hello")
 def hello():
