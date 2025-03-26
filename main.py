@@ -124,7 +124,6 @@ def metadata_to_style(metadata_list, style_id):
     stroke_colors = [single_stroke_color] * n
     return styles, biases, stroke_colors, stroke_widths
 
-
 def split_stroke_by_eos(stroke_coords):
     """
     Splits a list of stroke coordinates (each point is [x, y, eos])
@@ -229,7 +228,7 @@ class Hand:
 def process_stroke(item, stroke, initial_coord, line_height):
     """
     Process a single stroke: scales, converts offsets to coordinates, denoises,
-    aligns, adjusts for indent, and splits the stroke by end-of-sequence markers.
+    aligns, and splits the stroke by end-of-sequence markers.
     The starting coordinate is computed per-line so that processing is independent.
     """
     line = item["line"]
@@ -250,7 +249,7 @@ def process_stroke(item, stroke, initial_coord, line_height):
     # Scale the stroke offsets
     stroke[:, :2] *= 1.5
 
-    # Convert offsets to (x,y,eos) coordinates
+    # Convert offsets to (x, y, eos) coordinates
     coords = drawing.offsets_to_coords(stroke)
     coords = drawing.denoise(coords)
     coords[:, :2] = drawing.align(coords[:, :2])
@@ -259,9 +258,10 @@ def process_stroke(item, stroke, initial_coord, line_height):
     # Normalize coordinates relative to the minimum and adjust by the initial coordinate
     coords[:, :2] = coords[:, :2] - coords[:, :2].min() + initial_coord
 
-    # Adjust horizontal position based on metadata indent and a fixed offset
-    indent = meta.get("indent", 0)
-    coords[:, 0] += indent * 50 + 20
+    # If you want to keep any indent adjustment, modify or uncomment the following lines.
+    # Currently, they are commented out to ensure the stroke starts at (0, 0).
+    # indent = meta.get("indent", 0)
+    # coords[:, 0] += indent * 50 + 20
 
     stroke_coords = coords.tolist()
     stroke_segments = split_stroke_by_eos(stroke_coords)
@@ -274,9 +274,7 @@ def process_stroke(item, stroke, initial_coord, line_height):
         "stroke_color": sc
     }
 
-@app.get("/health")
-def health():
-    return {"message": "OK"}
+
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
@@ -333,7 +331,9 @@ def convert_markdown(request: MarkdownRequest):
     
     # Use a fixed line height and compute an independent starting coordinate per line
     line_height = 50
-    base_initial_coord = np.array([0, -(3 * line_height / 4)])
+    # base_initial_coord = np.array([0, -(3 * line_height / 4)])
+    base_initial_coord = np.array([0, 0])
+
 
     # Process each stroke concurrently using ThreadPoolExecutor.
     strokes_output = []
