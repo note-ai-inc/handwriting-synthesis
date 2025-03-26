@@ -16,4 +16,4 @@ echo "✅ Deployment process completed!"
 
 # Show the service URL
 echo "🌐 Service URL:"
-gcloud run services describe handwriting-synthesis --platform managed --region us-central1 --format 'value(status.url)' 
+gcloud run services describe handwriting-synthesis --platform managed --region asia-northeast3 --format 'value(status.url)' 
