@@ -276,6 +276,10 @@ def process_stroke(item, stroke, initial_coord, line_height):
 
 
 
+@app.get("/hello")
+def hello():
+    return {"message": "Hello, World!"}
+
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
     """
