@@ -1,27 +1,82 @@
 steps:
-  # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build',
-           '--progress=plain',
-           '--no-cache',
-           '-t', 'us-central1-docker.pkg.dev/optimum-rock-447312-u8/waiter-images/handwriting-synthesis:latest',
-           '.']
+    args: [
+      'build',
+      '--progress=plain',
+      '--no-cache',
+      '-t', 'handwriting-synthesis:latest',
+      '-t', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
+      '-t', 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
+      '-t', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
+      '.'
+    ]
 
-  # Push the container image
+  # Push to all regions in parallel
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/optimum-rock-447312-u8/waiter-images/handwriting-synthesis:latest']
+    id: 'push-asia'
+    args: ['push', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
 
-  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-us-west'
+    args: ['push', 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-us-east'
+    args: ['push', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
+
+  # Deploy steps remain unchanged...
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-asia'
+    waitFor: ['push-asia']
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'handwriting-synthesis'
+      - 'handwriting-synthesis-asia-northeast3'
       - '--image'
-      - 'us-central1-docker.pkg.dev/optimum-rock-447312-u8/waiter-images/handwriting-synthesis:latest'
+      - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
       - '--region'
-      - 'us-central1'
+      - 'asia-northeast3'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - '334167120222-compute@developer.gserviceaccount.com'
+      - '--port'
+      - '8000'
+  
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-us-west'
+    waitFor: ['push-us-west']
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'handwriting-synthesis-us-west2'
+      - '--image'
+      - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+      - '--region'
+      - 'us-west2'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--service-account'
+      - '334167120222-compute@developer.gserviceaccount.com'
+      - '--port'
+      - '8000'
+  
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-us-east'
+    waitFor: ['push-us-east']
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'handwriting-synthesis-us-east4'
+      - '--image'
+      - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+      - '--region'
+      - 'us-east4'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
@@ -34,4 +89,6 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 images:
-  - 'us-central1-docker.pkg.dev/optimum-rock-447312-u8/waiter-images/handwriting-synthesis:latest' 
+  - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+  - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+  - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
