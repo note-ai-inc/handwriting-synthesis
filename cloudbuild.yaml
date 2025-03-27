@@ -44,6 +44,10 @@ steps:
       - '334167120222-compute@developer.gserviceaccount.com'
       - '--port'
       - '8000'
+      - '--cpu'
+      - '8'
+      - '--memory'
+      - '32Gi'
   
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-us-west'
@@ -64,6 +68,10 @@ steps:
       - '334167120222-compute@developer.gserviceaccount.com'
       - '--port'
       - '8000'
+      - '--cpu'
+      - '8'
+      - '--memory'
+      - '32Gi'
   
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-us-east'
@@ -84,6 +92,10 @@ steps:
       - '334167120222-compute@developer.gserviceaccount.com'
       - '--port'
       - '8000'
+      - '--cpu'
+      - '8'
+      - '--memory'
+      - '32Gi'
 
 options:
   logging: CLOUD_LOGGING_ONLY
