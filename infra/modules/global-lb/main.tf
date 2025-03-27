@@ -58,7 +58,25 @@ resource "google_compute_url_map" "default" {
   provider = google
   project  = var.project_id
   name     = "${var.service_name}-urlmap"
-  default_service = google_compute_backend_service.default.id
+  
+  # Default to the redirect when no host rules match (handles IP access)
+  default_url_redirect {
+    host_redirect = var.domain_name
+    https_redirect = true
+    redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+    strip_query = false
+  }
+  
+  # Only allow access to the backend service when the host matches the domain name
+  host_rule {
+    hosts = [var.domain_name]
+    path_matcher = "domain-matcher"
+  }
+  
+  path_matcher {
+    name = "domain-matcher"
+    default_service = google_compute_backend_service.default.id
+  }
 }
 
 # Create URL map for HTTP to HTTPS redirect
