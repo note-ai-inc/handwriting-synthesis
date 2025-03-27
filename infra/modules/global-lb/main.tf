@@ -53,7 +53,7 @@ resource "google_compute_global_address" "default" {
   name     = "${var.service_name}-ip"
 }
 
-# URL map (existing)
+# Create URL map for HTTPS traffic
 resource "google_compute_url_map" "default" {
   provider = google
   project  = var.project_id
@@ -61,12 +61,26 @@ resource "google_compute_url_map" "default" {
   default_service = google_compute_backend_service.default.id
 }
 
-# HTTP proxy
+# Create URL map for HTTP to HTTPS redirect
+resource "google_compute_url_map" "http_redirect" {
+  provider = google
+  project  = var.project_id
+  name     = "${var.service_name}-http-redirect"
+  
+  default_url_redirect {
+    host_redirect = var.domain_name
+    https_redirect = true
+    redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+    strip_query = false
+  }
+}
+
+# HTTP proxy for redirect
 resource "google_compute_target_http_proxy" "default" {
   provider = google
   project  = var.project_id
   name     = "${var.service_name}-http-proxy"
-  url_map  = google_compute_url_map.default.id
+  url_map  = google_compute_url_map.http_redirect.id
 }
 
 # HTTP forwarding rule (updated to only use static IP)
