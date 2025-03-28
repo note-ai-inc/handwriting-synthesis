@@ -131,6 +131,7 @@ def parse_markdown(markdown_text):
     metadata = [item["metadata"] for item in results]
     return processed_lines, metadata
 
+
 def metadata_to_style(metadata_list, style_id):
     single_bias = 0.90        # fixed bias for every line
     single_stroke_color = 'black'
@@ -354,7 +355,6 @@ def convert_markdown(request: MarkdownRequest):
     try:
         # Generate stroke offsets for each reversed line using your GPU-accelerated model
         strokes = hand._sample(rev_lines, biases=rev_biases, styles=rev_styles)
-        # print(f"Generated strokes for {len(strokes)} lines.")
         # for i, s in enumerate(strokes):
         #     print(f"Stroke {i} shape: {s.shape if hasattr(s, 'shape') else len(s)}")
     except Exception as e:
