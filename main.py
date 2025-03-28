@@ -33,65 +33,68 @@ class MarkdownRequest(BaseModel):
     style_id: Optional[int] = 8  # Default style id is 8 if not provided
 
 
+SMART_QUOTES = {
+    "“": '"',
+    "”": '"',
+    "‘": "'",
+    "’": "'",
+    "–": "-",
+    "—": "-"
+}
+HEADER_PATTERN = re.compile(r"^(#{1,6})\s+(.*)")
+BULLET_PATTERN = re.compile(r"^[-*]\s+(.*)")
+NUMBERED_PATTERN = re.compile(r"^\d+\.\s+(.*)")
+BLOCKQUOTE_PATTERN = re.compile(r"^>\s+(.*)")
+EMPHASIS_BOLD = re.compile(r"(\*\*|__)")
+EMPHASIS_ITALIC = re.compile(r"(\*|_)")
+
+
 def parse_markdown(markdown_text):
     """
     Parses a markdown string and returns:
       - a list of text lines (with markdown markers removed and normalized)
       - a list of metadata dictionaries corresponding to each line.
     """
-    smart_quotes = {
-        "“": '"',
-        "”": '"',
-        "‘": "'",
-        "’": "'",
-        "–": "-",
-        "—": "-"
-    }
-    
     results = []
     for raw_line in markdown_text.splitlines():
         line = raw_line.strip()
         line_meta = {"type": "paragraph", "indent": 0}
 
-        # if not line:
-        #     results.append({"line": "", "metadata": line_meta})
-        #     continue
-
         # Detect header: lines starting with one or more #
-        header_match = re.match(r"^(#{1,6})\s+(.*)", line)
+        header_match = HEADER_PATTERN.match(line)
+        bullet_match = BULLET_PATTERN.match(line)
+        num_match = NUMBERED_PATTERN.match(line)
+        blockquote_match = BLOCKQUOTE_PATTERN.match(line)
+
         if header_match:
-            _, content = header_match.groups()
+            _, line = header_match.groups()
             line_meta["type"] = "header"
-            line = content
+
         # Detect bullet list items (start with '-' or '*')
-        elif re.match(r"^[-*]\s+(.*)", line):
-            bullet_match = re.match(r"^[-*]\s+(.*)", line)
-            content = bullet_match.group(1)
+        elif bullet_match:
+            line = bullet_match.group(1)
             line_meta["type"] = "bullet"
             line_meta["indent"] = 1
-            line = content
+
         # Detect numbered list items (e.g., "1. item")
-        elif re.match(r"^\d+\.\s+(.*)", line):
-            num_match = re.match(r"^\d+\.\s+(.*)", line)
-            content = num_match.group(1)
+        elif num_match:
+            line = num_match.group(1)
             line_meta["type"] = "numbered"
             line_meta["indent"] = 1
-            line = content
+            
         # Detect blockquotes (start with '>')
-        elif re.match(r"^>\s+(.*)", line):
-            quote_match = re.match(r"^>\s+(.*)", line)
-            content = quote_match.group(1)
+        elif blockquote_match:
+            line = blockquote_match.group(1)
             line_meta["type"] = "blockquote"
             line_meta["indent"] = 1
-            line = content
 
         # Replace smart punctuation
-        for smart, normal in smart_quotes.items():
+        for smart, normal in SMART_QUOTES.items():
             line = line.replace(smart, normal)
         
         # Remove markdown emphasis markers
-        line = re.sub(r"(\*\*|__)", "", line)
-        line = re.sub(r"(\*|_)", "", line)
+        line = EMPHASIS_BOLD.sub("", line)
+        line = EMPHASIS_ITALIC.sub("", line)
         
         # If the line is longer than 75 characters, split it into multiple lines
         if len(line) > 75:
