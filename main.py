@@ -296,9 +296,9 @@ def convert_markdown(request: MarkdownRequest):
     markdown_text = request.markdown
     try:
         lines, metadata = parse_markdown(markdown_text)
-        print(f"Parsed {len(lines)} lines.")
-        for i, (line, meta) in enumerate(zip(lines, metadata)):
-            print(f"Line {i}: {line} with metadata: {meta}")
+        # print(f"Parsed {len(lines)} lines.")
+        # for i, (line, meta) in enumerate(zip(lines, metadata)):
+        #     print(f"Line {i}: {line} with metadata: {meta}")
 
         # Use the provided style_id for all lines
         styles, biases, stroke_colors, stroke_widths = metadata_to_style(metadata, style_id=request.style_id)
@@ -334,9 +334,9 @@ def convert_markdown(request: MarkdownRequest):
     try:
         # Generate stroke offsets for each reversed line using your GPU-accelerated model
         strokes = hand._sample(rev_lines, biases=rev_biases, styles=rev_styles)
-        print(f"Generated strokes for {len(strokes)} lines.")
-        for i, s in enumerate(strokes):
-            print(f"Stroke {i} shape: {s.shape if hasattr(s, 'shape') else len(s)}")
+        # print(f"Generated strokes for {len(strokes)} lines.")
+        # for i, s in enumerate(strokes):
+        #     print(f"Stroke {i} shape: {s.shape if hasattr(s, 'shape') else len(s)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during handwriting synthesis: {str(e)}")
     
