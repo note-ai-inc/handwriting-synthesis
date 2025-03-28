@@ -94,20 +94,6 @@ def parse_markdown(markdown_text):
         # If the line is longer than 75 characters, split it into multiple lines
         if len(line) > 75:
             words = line.split()
-            current_line = ""
-            for word in words:
-                if current_line and (len(current_line) + len(word) + 1 > 75):
-                    results.append({"line": current_line, "metadata": line_meta.copy()})
-                    current_line = word
-                else:
-                    current_line = (current_line + " " + word).strip() if current_line else word
-            if current_line:
-                results.append({"line": current_line, "metadata": line_meta.copy()})
-        else:
-            results.append({"line": line, "metadata": line_meta})
-
-        if len(line) > 75:
-            words = line.split()
             current_line = []
             current_length = 0
             
