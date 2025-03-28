@@ -33,65 +33,63 @@ class MarkdownRequest(BaseModel):
     style_id: Optional[int] = 8  # Default style id is 8 if not provided
 
 
+
 def parse_markdown(markdown_text):
     """
     Parses a markdown string and returns:
       - a list of text lines (with markdown markers removed and normalized)
       - a list of metadata dictionaries corresponding to each line.
     """
-    smart_quotes = {
-        "“": '"',
-        "”": '"',
-        "‘": "'",
-        "’": "'",
-        "–": "-",
-        "—": "-"
+    SMART_QUOTES = {
+        "“": '"', "”": '"', "‘": "'",
+        "’": "'", "–": "-", "—": "-"
     }
-    
+    HEADER_PATTERN = re.compile(r"^(#{1,6})\s+(.*)")
+    BULLET_PATTERN = re.compile(r"^-\s+(.*)")
+    NUMBERED_PATTERN = re.compile(r"^\d+\.\s+(.*)")
+    BLOCKQUOTE_PATTERN = re.compile(r"^>\s+(.*)")
+    EMPHASIS_BOLD = re.compile(r"(\*\*|__)")
+    EMPHASIS_ITALIC = re.compile(r"(\*|_)")
+
     results = []
+    line_meta_base = {"type": "paragraph", "indent": 0}
+
     for raw_line in markdown_text.splitlines():
         line = raw_line.strip()
-        line_meta = {"type": "paragraph", "indent": 0}
+        line_meta = line_meta_base.copy()
 
-        # if not line:
-        #     results.append({"line": "", "metadata": line_meta})
-        #     continue
-
-        # Detect header: lines starting with one or more #
-        header_match = re.match(r"^(#{1,6})\s+(.*)", line)
-        if header_match:
-            _, content = header_match.groups()
-            line_meta["type"] = "header"
-            line = content
-        # Detect bullet list items (start with '-' or '*')
-        elif re.match(r"^[-*]\s+(.*)", line):
-            bullet_match = re.match(r"^[-*]\s+(.*)", line)
-            content = bullet_match.group(1)
-            line_meta["type"] = "bullet"
-            line_meta["indent"] = 1
-            line = content
-        # Detect numbered list items (e.g., "1. item")
-        elif re.match(r"^\d+\.\s+(.*)", line):
-            num_match = re.match(r"^\d+\.\s+(.*)", line)
-            content = num_match.group(1)
-            line_meta["type"] = "numbered"
-            line_meta["indent"] = 1
-            line = content
-        # Detect blockquotes (start with '>')
-        elif re.match(r"^>\s+(.*)", line):
-            quote_match = re.match(r"^>\s+(.*)", line)
-            content = quote_match.group(1)
-            line_meta["type"] = "blockquote"
-            line_meta["indent"] = 1
-            line = content
+        if line.startswith('#'):
+            header_match = HEADER_PATTERN.match(line)
+            if header_match:
+                _, line = header_match.groups()
+                line_meta["type"] = "header"
+        elif line.startswith('-'):
+            bullet_match = BULLET_PATTERN.match(line)
+            if bullet_match:
+                line = bullet_match.group(1)
+                line_meta["type"] = "bullet"
+                line_meta["indent"] = 1
+        elif line and line[0].isdigit():
+            num_match = NUMBERED_PATTERN.match(line)
+            if num_match:
+                line = num_match.group(1)
+                line_meta["type"] = "numbered"
+                line_meta["indent"] = 1
+        elif line.startswith('>'):
+            blockquote_match = BLOCKQUOTE_PATTERN.match(line)
+            if blockquote_match:
+                line = blockquote_match.group(1)
+                line_meta["type"] = "blockquote"
+                line_meta["indent"] = 1
 
         # Replace smart punctuation
-        for smart, normal in smart_quotes.items():
-            line = line.replace(smart, normal)
+        for smart, normal in SMART_QUOTES.items():
+            if smart in line:
+                line = line.replace(smart, normal)
         
         # Remove markdown emphasis markers
-        line = re.sub(r"(\*\*|__)", "", line)
-        line = re.sub(r"(\*|_)", "", line)
+        line = EMPHASIS_BOLD.sub("", line)
+        line = EMPHASIS_ITALIC.sub("", line)
         
         # If the line is longer than 75 characters, split it into multiple lines
         if len(line) > 75:
@@ -107,10 +105,32 @@ def parse_markdown(markdown_text):
                 results.append({"line": current_line, "metadata": line_meta.copy()})
         else:
             results.append({"line": line, "metadata": line_meta})
+
+        if len(line) > 75:
+            words = line.split()
+            current_line = []
+            current_length = 0
+            
+            for word in words:
+                word_len = len(word)
+                if current_line and (current_length + word_len + 1 > 75):
+                    results.append({"line": " ".join(current_line), "metadata": line_meta.copy()})
+                    current_line = [word]
+                    current_length = word_len
+                else:
+                    current_line.append(word)
+                    # Add 1 for the space, but only if it's not the first word
+                    current_length += word_len + (1 if current_line else 0)
+            
+            if current_line:
+                results.append({"line": " ".join(current_line), "metadata": line_meta.copy()})
+        else:
+            results.append({"line": line, "metadata": line_meta})
     
     processed_lines = [item["line"] for item in results]
     metadata = [item["metadata"] for item in results]
     return processed_lines, metadata
+
 
 def metadata_to_style(metadata_list, style_id):
     single_bias = 0.90        # fixed bias for every line
@@ -226,7 +246,7 @@ class Hand:
         return samples
 
 
-def process_stroke(item, stroke, initial_coord, line_height):
+def process_stroke(item, stroke, initial_coord):
     """
     Process a single stroke: scales, converts offsets to coordinates, denoises,
     aligns, adjusts for indent, and splits the stroke by end-of-sequence markers.
@@ -283,9 +303,11 @@ def health():
         "instance": os.environ.get('K_REVISION', 'unknown')
     }
 
+
 @app.get("/hello")
 def hello():
     return {"message": "Hello, World!"}
+
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
@@ -296,9 +318,8 @@ def convert_markdown(request: MarkdownRequest):
     markdown_text = request.markdown
     try:
         lines, metadata = parse_markdown(markdown_text)
-        print(f"Parsed {len(lines)} lines.")
-        for i, (line, meta) in enumerate(zip(lines, metadata)):
-            print(f"Line {i}: {line} with metadata: {meta}")
+        # for i, (line, meta) in enumerate(zip(lines, metadata)):
+        #     print(f"Line {i}: {line} with metadata: {meta}")
 
         # Use the provided style_id for all lines
         styles, biases, stroke_colors, stroke_widths = metadata_to_style(metadata, style_id=request.style_id)
@@ -334,15 +355,14 @@ def convert_markdown(request: MarkdownRequest):
     try:
         # Generate stroke offsets for each reversed line using your GPU-accelerated model
         strokes = hand._sample(rev_lines, biases=rev_biases, styles=rev_styles)
-        print(f"Generated strokes for {len(strokes)} lines.")
-        for i, s in enumerate(strokes):
-            print(f"Stroke {i} shape: {s.shape if hasattr(s, 'shape') else len(s)}")
+        # for i, s in enumerate(strokes):
+        #     print(f"Stroke {i} shape: {s.shape if hasattr(s, 'shape') else len(s)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during handwriting synthesis: {str(e)}")
     
     # Use a fixed line height and compute an independent starting coordinate per line
-    line_height = 50
-    base_initial_coord = np.array([0, -(3 * line_height / 4)])
+    LINE_HEIGHT = 50
+    base_initial_coord = np.array([0, -(3 * LINE_HEIGHT / 4)])
 
     # Process each stroke concurrently using ThreadPoolExecutor.
     strokes_output = []
@@ -352,8 +372,8 @@ def convert_markdown(request: MarkdownRequest):
         for idx, (item, stroke) in enumerate(zip(indexed_items_reversed, strokes)):
             # Calculate starting coordinate for this line:
             initial_coord = base_initial_coord.copy()
-            initial_coord[1] -= idx * line_height
-            futures.append(executor.submit(process_stroke, item, stroke, initial_coord, line_height))
+            initial_coord[1] -= idx * LINE_HEIGHT
+            futures.append(executor.submit(process_stroke, item, stroke, initial_coord))
         for future in futures:
             strokes_output.append(future.result())
 
