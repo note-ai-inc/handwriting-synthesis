@@ -5,6 +5,7 @@ Implementation of the handwriting synthesis experiments in the paper <a href="ht
 Web demo is available <a href="https://seanvasquez.com/handwriting-generation/">here</a>.
 
 ## Usage
+
 ```python
 lines = [
     "Now this is a story all about how",
