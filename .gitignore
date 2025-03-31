@@ -16,3 +16,6 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 .terraform/
+
+deploy_key
+deploy_key.pub

@@ -1,5 +1,104 @@
 steps:
+  # 1. Add the public SSH key to each VM's metadata and disable OS Login
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'add-ssh-keys'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+          # Create .ssh directory to avoid known_hosts warnings
+          mkdir -p /builder/home/.ssh
+
+          # Create SSH keys from the secret
+          echo "$$SSH_KEY" > /root/ssh_key
+          chmod 600 /root/ssh_key
+          ssh-keygen -y -f /root/ssh_key > /root/ssh_key.pub
+          chmod 600 /root/ssh_key.pub
+          KEY_CONTENT=$(cat /root/ssh_key.pub)
+
+          # Disable OS Login and add the public key for root via metadata
+          gcloud compute instances add-metadata handwriting-synthesis-vm-asia-northeast3 \
+            --zone=asia-northeast3-a \
+            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
+          gcloud compute instances add-metadata handwriting-synthesis-vm-us-west2 \
+            --zone=us-west2-a \
+            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
+          gcloud compute instances add-metadata handwriting-synthesis-vm-us-east4 \
+            --zone=us-east4-a \
+            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
+
+  # 2. Test SSH access to all VMs
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'test-ssh-access'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+          echo "Testing SSH access to all VMs..."
+
+          # Create .ssh directory to avoid known_hosts warnings
+          mkdir -p /builder/home/.ssh
+
+          # Create SSH keys for authentication
+          echo "$$SSH_KEY" > /root/ssh_key
+          chmod 600 /root/ssh_key
+          ssh-keygen -y -f /root/ssh_key > /root/ssh_key.pub
+          chmod 600 /root/ssh_key.pub
+
+          # Function to test SSH access (using root@)
+          test_ssh() {
+            local vm_name=$1
+            local zone=$2
+            echo "Testing $vm_name..."
+            
+            if gcloud compute ssh root@$vm_name \
+              --zone=$zone \
+              --tunnel-through-iap \
+              --project=${PROJECT_ID} \
+              --ssh-key-file=/root/ssh_key \
+              --force-key-file-overwrite \
+              --command="echo 'SSH to $vm_name successful'" 2>&1; then
+              echo "✅ Successfully connected to $vm_name"
+              return 0
+            else
+              echo "❌ Failed to connect to $vm_name"
+              return 1
+            fi
+          }
+          
+          # Test each VM
+          asia_success=false
+          us_west_success=false
+          us_east_success=false
+          
+          if test_ssh handwriting-synthesis-vm-asia-northeast3 asia-northeast3-a; then
+            asia_success=true
+          fi
+          
+          if test_ssh handwriting-synthesis-vm-us-west2 us-west2-a; then
+            us_west_success=true
+          fi
+          
+          if test_ssh handwriting-synthesis-vm-us-east4 us-east4-a; then
+            us_east_success=true
+          fi
+          
+          echo "SSH Test Results:"
+          echo "Asia VM: $([ "$asia_success" = true ] && echo "✅" || echo "❌")"
+          echo "US West VM: $([ "$us_west_success" = true ] && echo "✅" || echo "❌")"
+          echo "US East VM: $([ "$us_east_success" = true ] && echo "✅" || echo "❌")"
+          
+          if [ "$asia_success" = false ] || [ "$us_west_success" = false ] || [ "$us_east_success" = false ]; then
+            echo "SSH tests failed. Please check the logs above for details."
+            exit 1
+          fi
+          
+          echo "All SSH tests completed successfully!"
+    secretEnv: ['SSH_KEY']
+
+  # 3. Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
+    waitFor: ['test-ssh-access']
     args: [
       'build',
       '--progress=plain',
@@ -11,20 +110,20 @@ steps:
       '.'
     ]
 
-  # Push to all regions in parallel
+  # 4. Push images to registries
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-asia'
     args: ['push', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
-
+    
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-us-west'
     args: ['push', 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
-
+    
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-us-east'
     args: ['push', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
 
-  # Deploy steps remain unchanged...
+  # 5. Deploy to Cloud Run in different regions
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-asia'
     waitFor: ['push-asia']
@@ -48,7 +147,7 @@ steps:
       - '8'
       - '--memory'
       - '32Gi'
-  
+      
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-us-west'
     waitFor: ['push-us-west']
@@ -72,7 +171,7 @@ steps:
       - '8'
       - '--memory'
       - '32Gi'
-  
+      
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-us-east'
     waitFor: ['push-us-east']
@@ -97,6 +196,40 @@ steps:
       - '--memory'
       - '32Gi'
 
+  # 6. Restart VMs to trigger startup script
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'restart-vm-asia'
+    waitFor: ['push-asia']
+    entrypoint: gcloud
+    args:
+      - 'compute'
+      - 'instances'
+      - 'reset'
+      - 'handwriting-synthesis-vm-asia-northeast3'
+      - '--zone=asia-northeast3-a'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'restart-vm-us-west'
+    waitFor: ['push-us-west']
+    entrypoint: gcloud
+    args:
+      - 'compute'
+      - 'instances'
+      - 'reset'
+      - 'handwriting-synthesis-vm-us-west2'
+      - '--zone=us-west2-a'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'restart-vm-us-east'
+    waitFor: ['push-us-east']
+    entrypoint: gcloud
+    args:
+      - 'compute'
+      - 'instances'
+      - 'reset'
+      - 'handwriting-synthesis-vm-us-east4'
+      - '--zone=us-east4-a'
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
@@ -104,3 +237,8 @@ images:
   - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
   - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
   - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/${PROJECT_ID}/secrets/vm-ssh-key/versions/latest
+      env: 'SSH_KEY'

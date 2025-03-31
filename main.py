@@ -310,10 +310,12 @@ def process_stroke(item, stroke, initial_coord):
 @app.get("/health")
 def health():
     region = os.environ.get('CLOUD_RUN_REGION', 'unknown')
+    vm_name = os.environ.get('HOSTNAME', 'unknown')  # HOSTNAME is set by Docker to the container hostname
     return {
         "message": "OK",
         "region": region,
-        "instance": os.environ.get('K_REVISION', 'unknown')
+        "instance": os.environ.get('K_REVISION', 'unknown'),
+        "vm": vm_name
     }
 
 

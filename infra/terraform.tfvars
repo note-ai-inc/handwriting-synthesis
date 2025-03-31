@@ -1,0 +1,1 @@
+project_id = "handwriting-synthesis"  # Replace with your actual project ID 
