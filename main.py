@@ -231,6 +231,31 @@ class Hand:
         samples = [sample[~np.all(sample == 0.0, axis=1)] for sample in samples]
         return samples
 
+def optimize_strokes(strokes, precision=4):
+    """
+    Reduces the precision of the stroke coordinates and removes the pressure value.
+    Assumes each stroke is a list of coordinates [x, y, pressure], where pressure is the third value.
+    
+    :param strokes: List of strokes, where each stroke is a list of coordinates.
+    :param precision: The number of decimal places to round the coordinates.
+    :return: A list of processed strokes.
+    """
+
+    processed_strokes = []
+
+    for stroke in strokes:
+        # Process each stroke's coordinates
+        processed_stroke = []
+        
+        for point in stroke:
+            # Round the x, y coordinates to the given precision (remove pressure value)
+            processed_point = [round(float(point[0]), precision), round(float(point[1]), precision)]
+            processed_stroke.append(processed_point)
+        
+        processed_strokes.append(processed_stroke)
+
+    return processed_strokes
+
 
 def process_stroke(item, stroke, initial_coord):
     """
@@ -271,6 +296,8 @@ def process_stroke(item, stroke, initial_coord):
 
     stroke_coords = coords.tolist()
     stroke_segments = split_stroke_by_eos(stroke_coords)
+
+    stroke_segments = optimize_strokes(stroke_segments)
 
     return {
         "index": item["index"],
