@@ -297,7 +297,7 @@ def process_stroke(item, stroke, initial_coord):
     stroke_coords = coords.tolist()
     stroke_segments = split_stroke_by_eos(stroke_coords)
 
-    # stroke_segments = optimize_strokes(stroke_segments)
+    stroke_segments = optimize_strokes(stroke_segments)
 
     return {
         "index": item["index"],
