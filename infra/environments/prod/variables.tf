@@ -4,19 +4,31 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "The default GCP region"
+  description = "The default region"
   type        = string
-  default     = "asia-northeast3"
 }
 
 variable "regions" {
-  description = "List of regions to create repositories in"
+  description = "List of regions to deploy to"
   type        = list(string)
-  default     = ["asia-northeast3", "us-west2", "us-east4"]
 }
 
 variable "domain_name" {
-  description = "Domain name for the service"
+  description = "The domain name for the service"
   type        = string
-  default     = "synthesis.tricklau.xyz"
+}
+
+variable "vm_domain_name" {
+  description = "The domain name for the VM service"
+  type        = string
+}
+
+variable "service_account_id" {
+  description = "The service account ID (project number)"
+  type        = string
+}
+
+variable "repository_url" {
+  description = "The Git repository URL"
+  type        = string
 } 
