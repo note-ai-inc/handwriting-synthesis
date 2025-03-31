@@ -1,35 +1,6 @@
 steps:
-  # 1. Add the public SSH key to each VM's metadata and disable OS Login
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'add-ssh-keys'
-    entrypoint: bash
-    args:
-      - '-c'
-      - |
-          # Create .ssh directory to avoid known_hosts warnings
-          mkdir -p /builder/home/.ssh
-
-          # Create SSH keys from the secret
-          echo "$$SSH_KEY" > /root/ssh_key
-          chmod 600 /root/ssh_key
-          ssh-keygen -y -f /root/ssh_key > /root/ssh_key.pub
-          chmod 600 /root/ssh_key.pub
-          KEY_CONTENT=$(cat /root/ssh_key.pub)
-
-          # Disable OS Login and add the public key for root via metadata
-          gcloud compute instances add-metadata handwriting-synthesis-vm-asia-northeast3 \
-            --zone=asia-northeast3-a \
-            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
-          gcloud compute instances add-metadata handwriting-synthesis-vm-us-west2 \
-            --zone=us-west2-a \
-            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
-          gcloud compute instances add-metadata handwriting-synthesis-vm-us-east4 \
-            --zone=us-east4-a \
-            --metadata enable-oslogin=FALSE,ssh-keys=root:$${KEY_CONTENT}
-
-  # 2. Build the Docker image
+  # 1. Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    waitFor: ['add-ssh-keys']
     args: [
       'build',
       '--progress=plain',
@@ -41,7 +12,7 @@ steps:
       '.'
     ]
 
-  # 3. Push images to registries
+  # 2. Push images to registries
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-asia'
     args: ['push', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
@@ -54,7 +25,7 @@ steps:
     id: 'push-us-east'
     args: ['push', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
 
-  # 4. Deploy to Cloud Run in different regions
+  # 3. Deploy to Cloud Run in different regions
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-asia'
     waitFor: ['push-asia']
@@ -127,7 +98,7 @@ steps:
       - '--memory'
       - '32Gi'
 
-  # 5. Restart VMs to trigger startup script
+  # 4. Restart VMs to trigger startup script
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'restart-vm-asia'
     waitFor: ['push-asia']
@@ -168,8 +139,3 @@ images:
   - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
   - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
   - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/${PROJECT_ID}/secrets/vm-ssh-key/versions/latest
-      env: 'SSH_KEY'
