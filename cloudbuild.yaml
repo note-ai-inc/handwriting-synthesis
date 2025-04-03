@@ -42,7 +42,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--service-account'
-      - '334167120222-compute@developer.gserviceaccount.com'
+      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
       - '--port'
       - '8000'
       - '--cpu'
@@ -66,7 +66,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--service-account'
-      - '334167120222-compute@developer.gserviceaccount.com'
+      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
       - '--port'
       - '8000'
       - '--cpu'
@@ -90,7 +90,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--service-account'
-      - '334167120222-compute@developer.gserviceaccount.com'
+      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
       - '--port'
       - '8000'
       - '--cpu'
@@ -98,39 +98,116 @@ steps:
       - '--memory'
       - '32Gi'
 
-  # 4. Restart VMs to trigger startup script
+  # 4. Prepare SSH keys for VM updates
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'restart-vm-asia'
-    waitFor: ['push-asia']
+    id: 'prepare-ssh-keys'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Ensure .ssh directory exists and has correct permissions
+        mkdir -p /builder/home/.ssh
+        chmod 700 /builder/home/.ssh
+        # Generate keys non-interactively, force overwrite if needed. Exit code 1 is ignored if key exists.
+        ssh-keygen -t rsa -f /builder/home/.ssh/google_compute_engine -N '' -q <<< y || true
+        # Set correct permissions required by gcloud compute ssh
+        chmod 600 /builder/home/.ssh/google_compute_engine
+        chmod 644 /builder/home/.ssh/google_compute_engine.pub
+        echo "SSH keys prepared for gcloud."
+
+  # 5. Update VMs via SSH to pull and run the new container
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'update-vm-asia'
+    waitFor: ['push-asia', 'prepare-ssh-keys'] # Wait for keys and image
     entrypoint: gcloud
     args:
       - 'compute'
-      - 'instances'
-      - 'reset'
-      - 'handwriting-synthesis-vm-asia-northeast3'
+      - 'ssh'
+      - '--quiet' # Keep quiet flag
       - '--zone=asia-northeast3-a'
+      - 'handwriting-synthesis-vm-asia-northeast3'
+      - '--command'
+      - > # Use YAML multi-line string. Use $$ to escape shell variables for Cloud Build.
+        set -e &&
+        REGION_ENDPOINT="asia-northeast3-docker.pkg.dev" &&
+        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
+        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
+        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
+        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
+        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
+        echo "[Cloud Build SSH] Pulling image..." &&
+        sudo docker pull $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
+        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
+        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Starting new container..." &&
+        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Update complete on $(hostname)"
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'restart-vm-us-west'
-    waitFor: ['push-us-west']
+    id: 'update-vm-us-west'
+    waitFor: ['push-us-west', 'prepare-ssh-keys'] # Wait for keys and image
     entrypoint: gcloud
     args:
       - 'compute'
-      - 'instances'
-      - 'reset'
-      - 'handwriting-synthesis-vm-us-west2'
+      - 'ssh'
+      - '--quiet'
       - '--zone=us-west2-a'
+      - 'handwriting-synthesis-vm-us-west2'
+      - '--command'
+      - >
+        set -e &&
+        REGION_ENDPOINT="us-west2-docker.pkg.dev" &&
+        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
+        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
+        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
+        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
+        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
+        echo "[Cloud Build SSH] Pulling image..." &&
+        sudo docker pull $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
+        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
+        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Starting new container..." &&
+        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Update complete on $(hostname)"
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'restart-vm-us-east'
-    waitFor: ['push-us-east']
+    id: 'update-vm-us-east'
+    waitFor: ['push-us-east', 'prepare-ssh-keys'] # Wait for keys and image
     entrypoint: gcloud
     args:
       - 'compute'
-      - 'instances'
-      - 'reset'
-      - 'handwriting-synthesis-vm-us-east4'
+      - 'ssh'
+      - '--quiet'
       - '--zone=us-east4-a'
+      - 'handwriting-synthesis-vm-us-east4'
+      - '--command'
+      - >
+        set -e &&
+        REGION_ENDPOINT="us-east4-docker.pkg.dev" &&
+        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
+        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
+        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
+        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
+        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
+        echo "[Cloud Build SSH] Pulling image..." &&
+        sudo docker pull $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
+        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
+        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
+        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
+        echo "[Cloud Build SSH] Starting new container..." &&
+        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
+        echo "[Cloud Build SSH] Update complete on $(hostname)"
 
 options:
   logging: CLOUD_LOGGING_ONLY
