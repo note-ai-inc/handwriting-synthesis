@@ -7,21 +7,51 @@ terraform {
   }
 }
 
+# Create a dedicated service account for the VMs
+resource "google_service_account" "vm_service_account" {
+  account_id   = "${var.service_name}-vm-sa"
+  display_name = "${var.service_name} VM Service Account"
+  project      = var.project_id
+}
+
+# Grant Container Registry (GCR) reader role (access to underlying GCS buckets)
+# Note: This is for GCR, not Artifact Registry.
+resource "google_project_iam_member" "gcr_reader" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "serviceAccount:${google_service_account.vm_service_account.email}"
+}
+
+# Grant Artifact Registry reader role
+resource "google_project_iam_member" "artifact_registry_reader" {
+  project = var.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.vm_service_account.email}"
+}
+
 # Create VMs in each region
 resource "google_compute_instance" "vm" {
   for_each = toset(var.regions)
   
   name         = "${var.service_name}-${each.value}"
-  machine_type = "c2d-standard-16"
-  zone         = "${each.value}-a"  # Use 'a' zone in each region
+  machine_type = "c2d-highcpu-32"
+  zone         = "${each.value}-a"
   project      = var.project_id
   
+  # Ensure IAM roles and Firewalls are created before instance creation
+  depends_on = [
+    google_project_iam_member.gcr_reader,
+    google_project_iam_member.artifact_registry_reader,
+    google_compute_firewall.allow_http_https,
+    google_compute_firewall.allow_health_check
+  ]
+
   boot_disk {
     auto_delete = true
     device_name = "${var.service_name}-${each.value}"
 
     initialize_params {
-      image = "projects/debian-cloud/global/images/debian-12-bookworm-v20250311"
+      image = "projects/debian-cloud/global/images/family/debian-12"
       size  = 100
       type  = "pd-ssd"
     }
@@ -34,19 +64,14 @@ resource "google_compute_instance" "vm" {
     
     access_config {
       network_tier = "PREMIUM"
-      # This creates an ephemeral external IP
     }
   }
 
   service_account {
-    email  = "${var.service_account_id}-compute@developer.gserviceaccount.com"
+    # Use the dedicated service account created above
+    email  = google_service_account.vm_service_account.email
     scopes = [
-      "https://www.googleapis.com/auth/devstorage.read_only", 
-      "https://www.googleapis.com/auth/logging.write", 
-      "https://www.googleapis.com/auth/monitoring.write", 
-      "https://www.googleapis.com/auth/service.management.readonly", 
-      "https://www.googleapis.com/auth/servicecontrol", 
-      "https://www.googleapis.com/auth/trace.append"
+      "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
 
@@ -68,103 +93,69 @@ resource "google_compute_instance" "vm" {
   # Add labels for ops agent
   labels = {
     goog-ec-src = "vm_add-tf"
-    goog-ops-agent-policy = "v2-x86-template-1-4-0"
+    # Remove Ops agent label
+    # goog-ops-agent-policy = "v2-x86-template-1-4-0"
   }
 
   metadata = {
     enable-osconfig = "TRUE"
-    ssh-keys = "deploy:${var.ssh_public_key}"  # Add SSH key for deploy user
+    ssh-keys = "deploy:${var.ssh_public_key}"  # Keep SSH key
+    # Replace startup script with Docker installation
     startup-script = <<-EOF
       #!/bin/bash
-      set -e
+      set -e # Exit immediately if a command exits with a non-zero status.
+      exec > >(tee /var/log/startup-script.log|logger -t startup-script -s 2>/dev/console) 2>&1
 
-      echo "[$(date)] Starting startup script..."
+      echo "[$(date)] Starting Docker installation script..."
 
-      # Set HOME environment variable
-      export HOME=/root
+      # 1. Set up the repository
+      echo "[$(date)] Updating apt package index..."
+      apt-get update -y
+      echo "[$(date)] Installing prerequisite packages..."
+      apt-get install -y ca-certificates curl gnupg
 
-      echo "[$(date)] Checking if Docker is already installed..."
-      if command -v docker &> /dev/null; then
-        echo "[$(date)] Docker is already installed. Version: $(docker --version)"
-        echo "[$(date)] Skipping Docker installation..."
+      echo "[$(date)] Creating directory for apt keyrings..."
+      install -m 0755 -d /etc/apt/keyrings
+      echo "[$(date)] Downloading Docker's official GPG key..."
+      curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      chmod a+r /etc/apt/keyrings/docker.gpg
+
+      echo "[$(date)] Setting up the Docker repository..."
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      echo "[$(date)] Updating apt package index again after adding Docker repo..."
+      apt-get update -y
+
+      # 2. Install Docker Engine
+      echo "[$(date)] Installing Docker Engine, CLI, containerd, buildx, and compose plugin..."
+      apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+      # 3. Verify installation (optional, but good practice)
+      echo "[$(date)] Verifying Docker installation by running hello-world..."
+      if docker run hello-world; then
+        echo "[$(date)] Docker hello-world container ran successfully."
       else
-        echo "[$(date)] Docker is not installed. Proceeding with installation..."
-        echo "[$(date)] Installing required packages..."
-        apt-get update
-        apt-get install -y \
-          apt-transport-https \
-          ca-certificates \
-          curl \
-          gnupg \
-          lsb-release \
-          git \
-          google-cloud-cli
-
-        echo "[$(date)] Installing Docker..."
-        # Add Docker repository and key in a non-interactive way
-        echo "[$(date)] Setting up Docker repository..."
-        install -m 0755 -d /etc/apt/keyrings
-        echo "[$(date)] Downloading Docker GPG key..."
-        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        chmod a+r /etc/apt/keyrings/docker.gpg
-
-        echo "[$(date)] Adding Docker repository to apt sources..."
-        # Add the repository to Apt sources
-        echo \
-          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-          tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-        echo "[$(date)] Installing Docker packages..."
-        apt-get update
-        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        echo "[$(date)] ERROR: Docker hello-world container failed to run."
+        # Consider adding error handling/exit here if critical
       fi
 
-      echo "[$(date)] Configuring Docker..."
-      # Create docker group and add user
-      groupadd -f docker
-      usermod -aG docker root
-      usermod -aG docker deploy
+      # 4. Post-installation steps: Ensure Docker starts on boot
+      echo "[$(date)] Enabling Docker service to start on boot..."
+      systemctl enable docker
+      # Ensure the service is started now as well
+      systemctl start docker
+      echo "[$(date)] Docker service enabled and started."
 
-      echo "[$(date)] Setting up application..."
-      # Create application directory if it doesn't exist
-      mkdir -p /home/deploy/app
-      chown -R deploy:deploy /home/deploy/app
+      # Note: To run docker commands without sudo, add user to docker group:
+      # usermod -aG docker your-user
+      # This script runs as root, so sudo isn't needed for docker commands here.
 
-      echo "[$(date)] Configuring Git..."
-      # Configure Git for deploy user
-      su - deploy -c 'git config --global --add safe.directory /home/deploy/app/handwriting-synthesis'
-      su - deploy -c 'git config --global credential.helper store'
-
-      echo "[$(date)] Pulling latest changes..."
-      # Pull latest changes as deploy user
-      su - deploy -c 'cd /home/deploy/app/handwriting-synthesis && git pull'
-
-      echo "[$(date)] Building and running Docker container..."
-      # Build and run Docker container
-      cd /home/deploy/app/handwriting-synthesis
-      docker build -t handwriting-synthesis .
-      
-      # Stop and remove any existing containers
-      echo "[$(date)] Checking for existing containers..."
-      if [ "$(docker ps -q --filter ancestor=handwriting-synthesis)" ]; then
-        echo "[$(date)] Stopping existing containers..."
-        docker stop $(docker ps -q --filter ancestor=handwriting-synthesis)
-      fi
-      
-      if [ "$(docker ps -aq --filter ancestor=handwriting-synthesis)" ]; then
-        echo "[$(date)] Removing stopped containers..."
-        docker rm $(docker ps -aq --filter ancestor=handwriting-synthesis)
-      fi
-      
-      echo "[$(date)] Starting new container..."
-      docker run -d -p 80:8000 --restart always handwriting-synthesis
-
-      echo "[$(date)] Startup script completed successfully"
+      echo "[$(date)] Docker installation script completed."
     EOF
   }
-
-  depends_on = [google_compute_firewall.allow_http_https]
 }
 
 # Create a firewall rule for HTTP/HTTPS traffic
@@ -195,4 +186,4 @@ resource "google_compute_firewall" "allow_health_check" {
 
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
   target_tags   = ["lb-health-check"]
-} 
+}
