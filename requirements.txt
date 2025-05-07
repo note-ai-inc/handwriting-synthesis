@@ -5,3 +5,5 @@ scipy>=1.0.0
 svgwrite>=1.1.12
 uvicorn
 fastapi
+requests
+psutil

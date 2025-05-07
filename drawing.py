@@ -20,9 +20,8 @@ alphabet_ord = list(map(ord, alphabet))
 alpha_to_num = defaultdict(int, list(map(reversed, enumerate(alphabet))))
 num_to_alpha = dict(enumerate(alphabet_ord))
 
-MAX_STROKE_LEN = 1200
+MAX_STROKE_LEN = 3000
 MAX_CHAR_LEN = 75
-
 
 def align(coords):
     """
@@ -40,7 +39,6 @@ def align(coords):
     coords[:, :2] = np.dot(coords[:, :2], rotation_matrix) - offset
     return coords
 
-
 def skew(coords, degrees):
     """
     skews strokes by given degrees
@@ -51,7 +49,6 @@ def skew(coords, degrees):
     coords[:, :2] = np.dot(coords[:, :2], A)
     return coords
 
-
 def stretch(coords, x_factor, y_factor):
     """
     stretches strokes along x and y axis
@@ -60,7 +57,6 @@ def stretch(coords, x_factor, y_factor):
     coords[:, :2] *= np.array([x_factor, y_factor])
     return coords
 
-
 def add_noise(coords, scale):
     """
     adds gaussian noise to strokes
@@ -68,7 +64,6 @@ def add_noise(coords, scale):
     coords = np.copy(coords)
     coords[1:, :2] += np.random.normal(loc=0.0, scale=scale, size=coords[1:, :2].shape)
     return coords
-
 
 def encode_ascii(ascii_string):
     """
@@ -93,7 +88,6 @@ def denoise(coords):
 
     coords = np.vstack(new_coords)
     return coords
-
 
 def interpolate(coords, factor=2):
     """
@@ -128,7 +122,6 @@ def interpolate(coords, factor=2):
     coords = np.vstack(new_coords)
     return coords
 
-
 def normalize(offsets):
     """
     normalizes strokes to median unit norm
@@ -137,6 +130,28 @@ def normalize(offsets):
     offsets[:, :2] /= np.median(np.linalg.norm(offsets[:, :2], axis=1))
     return offsets
 
+def normalize_ref_strokes(coords):
+    """
+    normalizes reference strokes between -1 and 1
+    """
+    coords = np.copy(coords)
+    # Get min and max values for x and y coordinates
+    x_min, x_max = np.min(coords[:, 0]), np.max(coords[:, 0])
+    y_min, y_max = np.min(coords[:, 1]), np.max(coords[:, 1])
+    
+    # Calculate ranges
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+    
+    # Normalize x coordinates
+    if x_range != 0:
+        coords[:, 0] = 2 * (coords[:, 0] - x_min) / x_range - 1
+    
+    # Normalize y coordinates
+    if y_range != 0:
+        coords[:, 1] = 2 * (coords[:, 1] - y_min) / y_range - 1
+        
+    return coords
 
 def coords_to_offsets(coords):
     """
@@ -152,7 +167,6 @@ def offsets_to_coords(offsets):
     convert from offsets to coordinates
     """
     return np.concatenate([np.cumsum(offsets[:, :2], axis=0), offsets[:, 2:3]], axis=1)
-
 
 def draw(
         offsets,
@@ -179,13 +193,15 @@ def draw(
     for x, y, eos in strokes:
         stroke.append((x, y))
         if eos == 1:
-            coords = zip(*stroke)
-            ax.plot(coords[0], coords[1], 'k')
+            if stroke:
+                x_vals, y_vals = zip(*stroke)
+                ax.plot(x_vals, y_vals, 'k')
             stroke = []
-    if stroke:
-        coords = zip(*stroke)
-        ax.plot(coords[0], coords[1], 'k')
-        stroke = []
+
+    if stroke:  # In case the last stroke doesn't end with eos=1
+        x_vals, y_vals = zip(*stroke)
+        ax.plot(x_vals, y_vals, 'k')
+
 
     ax.set_xlim(-50, 600)
     ax.set_ylim(-40, 40)

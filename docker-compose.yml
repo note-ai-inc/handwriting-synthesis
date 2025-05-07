@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  handwriting-synthesis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./styles:/app/styles
+      - ./final_checkpoints:/app/final_checkpoints
+      - ./debug_logs:/app/debug_logs
+      - ./temp:/tmp
+      - ./output:/app/output
+      - .:/app
+    environment:
+      - CLOUD_RUN_REGION=${CLOUD_RUN_REGION:-unknown}
+      - HOSTNAME=${HOSTNAME:-unknown}
+      - K_REVISION=${K_REVISION:-unknown}
+      - GEMINI_SERVICE_URL=http://handwriting-quality:5000
+      - UVICORN_RELOAD=true
+      - UVICORN_RELOAD_DIRS=/app
+    networks:
+      - handwriting-network
+      - external-network
+    depends_on:
+      - handwriting-quality
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  handwriting-quality:
+    build:
+      context: .
+      dockerfile: Dockerfile.gemini
+    expose:
+      - "5000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - ./temp:/tmp
+    networks:
+      - handwriting-network
+      - external-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+networks:
+  handwriting-network:
+    driver: bridge
+    internal: true
+  external-network:
+    driver: bridge

@@ -1,218 +1,47 @@
 steps:
-  # 1. Build the Docker image
+  # Build and push the handwriting synthesis service
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build',
-      '--progress=plain',
-      '--no-cache',
-      '-t', 'handwriting-synthesis:latest',
-      '-t', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
-      '-t', 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
-      '-t', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest',
-      '.'
-    ]
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/handwriting-synthesis:$COMMIT_SHA', '-f', 'Dockerfile', '.']
 
-  # 2. Push images to registries
+  # Build and push the handwriting quality service
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-asia'
-    args: ['push', 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
-    
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-us-west'
-    args: ['push', 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
-    
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'push-us-east'
-    args: ['push', 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/handwriting-quality:$COMMIT_SHA', '-f', 'Dockerfile.gemini', '.']
 
-  # 3. Deploy to Cloud Run in different regions
+  # Push the images
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/handwriting-synthesis:$COMMIT_SHA']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/handwriting-quality:$COMMIT_SHA']
+
+  # Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy-asia'
-    waitFor: ['push-asia']
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'handwriting-synthesis-asia-northeast3'
+      - 'handwriting-synthesis'
       - '--image'
-      - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+      - 'gcr.io/$PROJECT_ID/handwriting-synthesis:$COMMIT_SHA'
       - '--region'
       - 'asia-northeast3'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--service-account'
-      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
-      - '--port'
-      - '8000'
-      - '--cpu'
-      - '8'
-      - '--memory'
-      - '32Gi'
-      
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy-us-west'
-    waitFor: ['push-us-west']
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'handwriting-synthesis-us-west2'
+      - 'handwriting-quality'
       - '--image'
-      - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+      - 'gcr.io/$PROJECT_ID/handwriting-quality:$COMMIT_SHA'
       - '--region'
-      - 'us-west2'
+      - 'asia-northeast3'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--service-account'
-      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
-      - '--port'
-      - '8000'
-      - '--cpu'
-      - '8'
-      - '--memory'
-      - '32Gi'
-      
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy-us-east'
-    waitFor: ['push-us-east']
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'handwriting-synthesis-us-east4'
-      - '--image'
-      - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
-      - '--region'
-      - 'us-east4'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--service-account'
-      - 'cloudbuild-custom-sa@optimum-rock-447312-u8.iam.gserviceaccount.com'
-      - '--port'
-      - '8000'
-      - '--cpu'
-      - '8'
-      - '--memory'
-      - '32Gi'
-
-  # 4. Prepare SSH keys for VM updates
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'prepare-ssh-keys'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # Ensure .ssh directory exists and has correct permissions
-        mkdir -p /builder/home/.ssh
-        chmod 700 /builder/home/.ssh
-        # Generate keys non-interactively, force overwrite if needed. Exit code 1 is ignored if key exists.
-        ssh-keygen -t rsa -f /builder/home/.ssh/google_compute_engine -N '' -q <<< y || true
-        # Set correct permissions required by gcloud compute ssh
-        chmod 600 /builder/home/.ssh/google_compute_engine
-        chmod 644 /builder/home/.ssh/google_compute_engine.pub
-        echo "SSH keys prepared for gcloud."
-
-  # 5. Update VMs via SSH to pull and run the new container
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'update-vm-asia'
-    waitFor: ['push-asia', 'prepare-ssh-keys'] # Wait for keys and image
-    entrypoint: gcloud
-    args:
-      - 'compute'
-      - 'ssh'
-      - '--quiet' # Keep quiet flag
-      - '--zone=asia-northeast3-a'
-      - 'handwriting-synthesis-vm-asia-northeast3'
-      - '--command'
-      - > # Use YAML multi-line string. Use $$ to escape shell variables for Cloud Build.
-        set -e &&
-        REGION_ENDPOINT="asia-northeast3-docker.pkg.dev" &&
-        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
-        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
-        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
-        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
-        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
-        echo "[Cloud Build SSH] Pulling image..." &&
-        sudo docker pull $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
-        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
-        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Starting new container..." &&
-        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Update complete on $(hostname)"
-
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'update-vm-us-west'
-    waitFor: ['push-us-west', 'prepare-ssh-keys'] # Wait for keys and image
-    entrypoint: gcloud
-    args:
-      - 'compute'
-      - 'ssh'
-      - '--quiet'
-      - '--zone=us-west2-a'
-      - 'handwriting-synthesis-vm-us-west2'
-      - '--command'
-      - >
-        set -e &&
-        REGION_ENDPOINT="us-west2-docker.pkg.dev" &&
-        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
-        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
-        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
-        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
-        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
-        echo "[Cloud Build SSH] Pulling image..." &&
-        sudo docker pull $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
-        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
-        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Starting new container..." &&
-        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Update complete on $(hostname)"
-
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'update-vm-us-east'
-    waitFor: ['push-us-east', 'prepare-ssh-keys'] # Wait for keys and image
-    entrypoint: gcloud
-    args:
-      - 'compute'
-      - 'ssh'
-      - '--quiet'
-      - '--zone=us-east4-a'
-      - 'handwriting-synthesis-vm-us-east4'
-      - '--command'
-      - >
-        set -e &&
-        REGION_ENDPOINT="us-east4-docker.pkg.dev" &&
-        CONTAINER_IMAGE_URI="$${REGION_ENDPOINT}/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest" &&
-        BASE_IMAGE_NAME=$(echo $$CONTAINER_IMAGE_URI | cut -d':' -f1) &&
-        echo "[Cloud Build SSH] Updating container on $(hostname) to $$CONTAINER_IMAGE_URI" &&
-        echo "[Cloud Build SSH] Configuring Docker authentication for $${REGION_ENDPOINT}..." &&
-        sudo gcloud auth configure-docker $${REGION_ENDPOINT} --quiet &&
-        echo "[Cloud Build SSH] Pulling image..." &&
-        sudo docker pull $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Checking for running containers ($$BASE_IMAGE_NAME)..." &&
-        RUNNING_CONTAINERS=$(sudo docker ps -q --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$RUNNING_CONTAINERS" ]; then echo '[Cloud Build SSH] Stopping existing containers...' && sudo docker stop $$RUNNING_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Checking for stopped containers ($$BASE_IMAGE_NAME)..." &&
-        STOPPED_CONTAINERS=$(sudo docker ps -aq --filter ancestor=$$BASE_IMAGE_NAME) &&
-        if [ -n "$$STOPPED_CONTAINERS" ]; then echo '[Cloud Build SSH] Removing stopped containers...' && sudo docker rm $$STOPPED_CONTAINERS; fi &&
-        echo "[Cloud Build SSH] Starting new container..." &&
-        sudo docker run -d -p 80:8000 --restart always $$CONTAINER_IMAGE_URI &&
-        echo "[Cloud Build SSH] Update complete on $(hostname)"
-
-options:
-  logging: CLOUD_LOGGING_ONLY
 
 images:
-  - 'asia-northeast3-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
-  - 'us-west2-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
-  - 'us-east4-docker.pkg.dev/${PROJECT_ID}/handwriting-synthesis-service-images/handwriting-synthesis:latest'
+  - 'gcr.io/$PROJECT_ID/handwriting-synthesis:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/handwriting-quality:$COMMIT_SHA'
