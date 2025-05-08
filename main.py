@@ -13,7 +13,7 @@ import tempfile
 import uuid
 import drawing
 import matplotlib
-# Use non-interactive backend for better performance
+# Use non-interactive backend 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import threading
