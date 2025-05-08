@@ -1,3 +1,6 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Build and push the handwriting synthesis service
   - name: 'gcr.io/cloud-builders/docker'
