@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import threading
 import concurrent.futures
 from functools import partial
+import json
+from datetime import datetime
 
 # Configure TensorFlow for better performance
 # But without complex multiprocessing that causes session issues
@@ -56,7 +58,7 @@ app.add_middleware(
 class MarkdownRequest(BaseModel):
     markdown: str
     style_id: Optional[int] = 8  # Default style id if not provided
-    ref_style_strokes: Optional[list] = None  # Optional reference style strokes
+    ref_strokes: Optional[list] = None
 
 # Set up the model
 DATA_DIR = "data/processed"
@@ -413,7 +415,7 @@ def render_strokes_to_image(strokes, out_path, dpi=150):
     plt.close(fig)
 
 # Process a single item with proper thread safety
-def process_single_item(item, ref_style_strokes=None):
+def process_single_item(item, ref_strokes=None):
     """
     Process a single line item into handwriting strokes.
     Thread-safe implementation using the global session.
@@ -424,9 +426,9 @@ def process_single_item(item, ref_style_strokes=None):
     x_prime, x_prime_len, chars, chars_len, max_tsteps = build_input_tensors(item, text_len)
     
     # Use provided reference style strokes if available
-    if ref_style_strokes is not None:
+    if ref_strokes is not None:
         try:
-            ref_strokes = np.array(ref_style_strokes, dtype=np.float32)
+            ref_strokes = np.array(ref_strokes, dtype=np.float32)
             x_prime = ref_strokes.reshape(1, -1, 3)
             x_prime_len = np.array([len(ref_strokes)], dtype=np.int32)
         except Exception as e:
@@ -473,6 +475,31 @@ def health():
 def hello():
     return {"message": "Hello, World!"}
 
+def save_request_data(request: MarkdownRequest, output_dir: str = "saved_requests"):
+    """
+    Save the incoming request data to a JSON file.
+    """
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate unique filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"request_{timestamp}_{uuid.uuid4().hex[:8]}.json"
+    filepath = os.path.join(output_dir, filename)
+    
+    # Convert request to dict and save
+    request_data = {
+        "markdown": request.markdown,
+        "style_id": request.style_id,
+        "ref_strokes": request.ref_strokes,
+        "timestamp": timestamp
+    }
+    
+    with open(filepath, 'w') as f:
+        json.dump(request_data, f, indent=2)
+    
+    return filepath
+
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
     """
@@ -481,6 +508,13 @@ def convert_markdown(request: MarkdownRequest):
     3. Process lines in parallel using thread pool.
     4. Merge all processed lines back into the full-page strokes JSON.
     """
+    # Save the incoming request data
+    try:
+        saved_file = save_request_data(request)
+        logging.info(f"Saved request data to {saved_file}")
+    except Exception as e:
+        logging.error(f"Failed to save request data: {e}")
+    
     # 1) Parse markdown → lines + metadata
     try:
         lines, metadata = parse_markdown(request.markdown)
@@ -508,10 +542,6 @@ def convert_markdown(request: MarkdownRequest):
             "stroke_color": sc
         })
 
-    # 3) Thread-based parallel processing for high performance
-    # Using thread pool is more reliable than multiprocessing with TensorFlow
-    base_initial_coord = np.array([0, -30])
-    
     # Determine optimal number of threads based on CPU count
     cpu_count = os.cpu_count() or 4
     # Use 2x CPU count for I/O bound tasks, but cap to avoid too much overhead
@@ -520,7 +550,7 @@ def convert_markdown(request: MarkdownRequest):
     logging.info(f"Using {max_workers} worker threads with {cpu_count} CPU cores")
     
     # Check if reference style strokes were provided
-    ref_strokes = request.ref_style_strokes
+    ref_strokes = request.ref_strokes
     
     # Process items in parallel using thread pool
     try:
