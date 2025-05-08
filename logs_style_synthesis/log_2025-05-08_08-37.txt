@@ -145,3 +145,7 @@ new run with parameters:
 [[05/08/2025 08:37:32 AM]] Started server process [8]
 [[05/08/2025 08:37:32 AM]] Waiting for application startup.
 [[05/08/2025 08:37:32 AM]] Application startup complete.
+[[05/08/2025 02:01:08 PM]] Shutting down
+[[05/08/2025 02:01:08 PM]] Waiting for application shutdown.
+[[05/08/2025 02:01:08 PM]] Application shutdown complete.
+[[05/08/2025 02:01:08 PM]] Finished server process [8]

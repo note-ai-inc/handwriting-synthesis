@@ -13,7 +13,7 @@ import tempfile
 import uuid
 import drawing
 import matplotlib
-# Use non-interactive backend 
+# Use non-interactive backend for better performance in server environments
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import threading
@@ -22,7 +22,6 @@ from functools import partial
 import json
 from datetime import datetime
 
-# Configure TensorFlow for better performance
 # But without complex multiprocessing that causes session issues
 config = tf.ConfigProto(
     intra_op_parallelism_threads=4,  # Use fixed value
