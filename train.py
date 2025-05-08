@@ -190,7 +190,7 @@ class StyleDataReader(object):
         data_cols = ["x", "x_len", "c", "c_len"]
         arrays = []
         for dc in data_cols:
-            arr = np.load(os.path.join(data_dir, f"{dc}.npy"))
+            arr = np.load(os.path.join(data_dir, f"{dc}.npy"), allow_pickle=True)
             arrays.append(arr)
         self.df = DataFrame(columns=data_cols, data=arrays)
         self.train_df, self.val_df = self.df.train_test_split(train_size=0.95, random_state=42)
