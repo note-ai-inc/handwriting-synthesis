@@ -2,13 +2,41 @@ import os
 import re
 import logging
 import numpy as np
+import tensorflow as tf
+import random
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from fastapi.middleware.cors import CORSMiddleware
-from concurrent.futures import ThreadPoolExecutor
-from rnn import rnn
+from train import StyleSynthesisModel, StyleDataReader
+import tempfile
+import uuid
 import drawing
+import matplotlib
+# Use non-interactive backend for better performance
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import threading
+import concurrent.futures
+from functools import partial
+import json
+from datetime import datetime
+
+# Configure TensorFlow for better performance
+# But without complex multiprocessing that causes session issues
+config = tf.ConfigProto(
+    intra_op_parallelism_threads=4,  # Use fixed value
+    inter_op_parallelism_threads=4,  # Use fixed value
+    allow_soft_placement=True
+)
+# Use a single global session that can be shared across threads (but not processes)
+session = tf.Session(config=config)
+tf.keras.backend.set_session(session)
+
+# Set seeds for determinism
+random.seed(42)
+np.random.seed(42)
+tf.set_random_seed(42)
 
 app = FastAPI()
 
@@ -30,23 +58,65 @@ app.add_middleware(
 class MarkdownRequest(BaseModel):
     markdown: str
     style_id: Optional[int] = 8  # Default style id if not provided
+    ref_strokes: Optional[list] = None
+
+# Set up the model
+DATA_DIR = "data/processed"
+reader = StyleDataReader(DATA_DIR)
+style_model = StyleSynthesisModel(
+    reader=reader,
+    log_dir="logs_style_synthesis",
+    checkpoint_dir="checkpoints_style_synthesis",
+    prediction_dir="predictions_style_synthesis",
+    learning_rates=[1e-4],
+    batch_sizes=[32],
+    patiences=[2000],
+    beta1_decays=[0.9],
+    validation_batch_size=32,
+    optimizer='rms',
+    num_training_steps=30000,
+    regularization_constant=0.0,
+    keep_prob=1.0,
+    enable_parameter_averaging=False,
+    min_steps_to_checkpoint=2000,
+    log_interval=50,
+    grad_clip=10,
+    lstm_size=400,
+    output_mixture_components=20,
+    attention_mixture_components=10,
+    style_embedding_size=256
+)
+
+# Restore from latest or specific checkpoint
+checkpoint_path = "final_checkpoints/model-10350"
+style_model.saver.restore(style_model.session, checkpoint_path)
+
+# Set deterministic sampling
+style_model.sampling_mode = "deterministic"
+style_model.force_deterministic_sampling = True
+style_model.temperature = 0.5
+
+# Global thread lock for TensorFlow operations
+tf_lock = threading.RLock()
+
+# Utility functions
+SMART_QUOTES = {""": '"', """: '"', "'": "'", "'": "'", "–": '-', "—": '-'}
+HEADER_PATTERN = re.compile(r"^(#{1,6})\s+(.*)")
+BULLET_PATTERN = re.compile(r"^-\s+(.*)")
+NUMBERED_PATTERN = re.compile(r"^\d+\.\s+(.*)")
+BLOCKQUOTE_PATTERN = re.compile(r"^>\s+(.*)")
+EMPHASIS_BOLD = re.compile(r"(\*\*|__)")
+EMPHASIS_ITALIC = re.compile(r"(\*|_)")
 
 def parse_markdown(markdown_text):
     """
     Parses a markdown string and returns:
       - a list of text lines (with markdown markers removed and normalized)
       - a list of metadata dictionaries corresponding to each line.
-
-    Steps included:
-      - Identify markdown elements (headers, bullets, etc.) and store their metadata
-      - Remove emphasis markers like ** or *
-      - Split out any word > 7 chars into its own segment
-      - Word-wrap at 75 chars
-      - Remove or replace special characters if desired
     """
     SMART_QUOTES = {
-        "“": '"', "”": '"', "‘": "'",
-        "’": "'", "–": "-", "—": "-"
+        """: '"', """: '"', "'": "'",
+        "'": "'", "–": "-", "—": "-"
     }
     HEADER_PATTERN = re.compile(r"^(#{1,6})\s+(.*)")
     BULLET_PATTERN = re.compile(r"^-\s+(.*)")
@@ -156,17 +226,13 @@ def metadata_to_style(metadata_list, style_id, lines):
 
     lines = lines.split("\n")
     biases = .2*np.flip(np.cumsum([len(i) == 0 for i in lines]), 0)
+    # Using constant bias value, similar to test_syn.py
+    biases = [0.75 for _ in range(n)]
     styles = [style_id for i in lines]
 
     pattern = [1, 1, 1, 1]
     stroke_widths = (pattern * ((n // len(pattern)) + 1))[:n]
     stroke_colors = [single_stroke_color] * n
-
-    print(lines)
-    print(biases)
-    print(styles)
-    print(stroke_widths)
-    print(stroke_colors)
     
     return styles, biases, stroke_colors, stroke_widths
 
@@ -183,80 +249,6 @@ def split_stroke_by_eos(stroke_coords):
         segments.append(current_segment)
     return segments
 
-class Hand:
-    def __init__(self):
-        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-        self.nn = rnn(
-            log_dir='logs',
-            checkpoint_dir='checkpoints',
-            prediction_dir='predictions',
-            learning_rates=[.0001, .00005, .00002],
-            batch_sizes=[32, 64, 64],
-            patiences=[1500, 1000, 500],
-            beta1_decays=[.9, .9, .9],
-            validation_batch_size=32,
-            optimizer='rms',
-            num_training_steps=100000,
-            warm_start_init_step=17900,
-            regularization_constant=0.0,
-            keep_prob=1.0,
-            enable_parameter_averaging=False,
-            min_steps_to_checkpoint=2000,
-            log_interval=20,
-            logging_level=logging.CRITICAL,
-            grad_clip=10,
-            lstm_size=400,
-            output_mixture_components=20,
-            attention_mixture_components=10
-        )
-        self.nn.restore()
-
-    def _sample(self, lines, biases=None, styles=None):
-        num_samples = len(lines)
-        max_tsteps = 40 * max(len(line) for line in lines)
-        biases = biases if biases is not None else [0.5] * num_samples
-
-        x_prime = np.zeros([num_samples, 1200, 3])
-        x_prime_len = np.zeros([num_samples])
-        chars = np.zeros([num_samples, 120])
-        chars_len = np.zeros([num_samples])
-
-        if styles is not None:
-            for i, (cs, style) in enumerate(zip(lines, styles)):
-                x_p = np.load(f'styles/style-{style}-strokes.npy')
-                c_p = np.load(f'styles/style-{style}-chars.npy').tostring().decode('utf-8')
-                
-                # Prime with style strokes and append target text
-                c_p = str(c_p) + " " + cs
-                c_p = drawing.encode_ascii(c_p)
-                c_p = np.array(c_p)
-                
-                x_prime[i, :len(x_p), :] = x_p
-                x_prime_len[i] = len(x_p)
-                chars[i, :len(c_p)] = c_p
-                chars_len[i] = len(c_p)
-        else:
-            for i, text_line in enumerate(lines):
-                encoded = drawing.encode_ascii(text_line)
-                chars[i, :len(encoded)] = encoded
-                chars_len[i] = len(encoded)
-
-        [samples] = self.nn.session.run(
-            [self.nn.sampled_sequence],
-            feed_dict={
-                self.nn.prime: styles is not None,
-                self.nn.x_prime: x_prime,
-                self.nn.x_prime_len: x_prime_len,
-                self.nn.num_samples: num_samples,
-                self.nn.sample_tsteps: max_tsteps,
-                self.nn.c: chars,
-                self.nn.c_len: chars_len,
-                self.nn.bias: biases
-            }
-        )
-        samples = [sample[~np.all(sample == 0.0, axis=1)] for sample in samples]
-        return samples
-
 def optimize_strokes(strokes, precision=4):
     processed_strokes = []
     for stroke in strokes:
@@ -270,8 +262,7 @@ def optimize_strokes(strokes, precision=4):
 def process_stroke(item, stroke, initial_coord):
     """
     Converts a single sub-segment (line item) into coordinate strokes
-    at a given 'initial_coord'. In this updated approach, we are 
-    NOT forcibly offsetting each segment vertically by idx.
+    at a given 'initial_coord'.
     """
     line = item["line"]
     meta = item["metadata"]
@@ -320,18 +311,6 @@ def combine_segments_as_one_line(list_of_segments, spacing=20):
     """
     Takes a list of sub-segment stroke data and places each 
     sub-segment horizontally after the previous one.
-
-    list_of_segments: [
-       [ [ (x,y), (x,y), ... ],  # stroke1 for sub-segment1
-         [ (x,y), (x,y), ... ],  # stroke2 for sub-segment1
-         ...
-       ],
-       [ [ (x,y), (x,y), ... ],  # stroke1 for sub-segment2
-         ...
-       ],
-       ...
-    ]
-    Returns a single list of strokes with horizontal bounding-box alignment.
     """
     x_offset = 0.0
     combined_strokes = []
@@ -366,38 +345,189 @@ def combine_segments_as_one_line(list_of_segments, spacing=20):
 
     return combined_strokes
 
-hand = Hand()
+def build_input_tensors(item, text_len):
+    """
+    Build the input tensors for the model, following test_syn.py approach
+    """
+    style_id = item["style"]
+    style_strokes = np.load(f"styles/style-{style_id}-strokes.npy")
+    style_chars = np.load(f"styles/style-{style_id}-chars.npy").tobytes().decode('ascii')
+    text = item["line"]
+    
+    full_char_seq = drawing.encode_ascii(style_chars + ' ' + text)
+    
+    # Create arrays with proper shapes
+    x_prime = np.zeros((1, 1200, 3), dtype=np.float32)
+    x_prime_len = np.zeros((1,), dtype=np.int32)
+    chars = np.zeros((1, 120), dtype=np.int32)
+    chars_len = np.zeros((1,), dtype=np.int32)
+    
+    # Fill arrays with data
+    chars[0, :len(full_char_seq)] = full_char_seq
+    chars_len[0] = len(full_char_seq)
+    
+    x_prime[0, :len(style_strokes), :] = style_strokes
+    x_prime_len[0] = len(style_strokes)
+    
+    max_tsteps = 40 * max(1, text_len)
+    
+    return x_prime, x_prime_len, chars, chars_len, max_tsteps
+
+def render_strokes_to_image(strokes, out_path, dpi=150):
+    """
+    Renders a list of stroke sequences to a PNG file.
+    """
+    # 1) Compute global bounds so we can crop tightly
+    all_x = [pt[0] for stroke in strokes for pt in stroke]
+    all_y = [pt[1] for stroke in strokes for pt in stroke]
+    if not all_x or not all_y:
+        # Create empty image
+        fig, ax = plt.subplots(figsize=(1, 1), dpi=dpi)
+        ax.axis('off')
+        fig.savefig(out_path, dpi=dpi, bbox_inches='tight', pad_inches=0)
+        plt.close(fig)
+        return
+        
+    min_x, max_x = min(all_x), max(all_x)
+    min_y, max_y = min(all_y), max(all_y)
+    width, height = max_x - min_x, max_y - min_y
+
+    # 2) Create a figure sized roughly to the stroke extents
+    fig, ax = plt.subplots(figsize=((width + 20) / 100, (height + 20) / 100), dpi=dpi)
+    for stroke in strokes:
+        if len(stroke) < 2:
+            continue
+        # normalize to (0,0) origin
+        xs = [x - min_x + 10 for x, y in stroke]
+        ys = [y - min_y + 10 for x, y in stroke]
+        ax.plot(xs, ys, color='black', linewidth=1)
+    
+    # invert y-axis
+    ax.invert_yaxis()
+
+    # 3) Tidy up axes
+    ax.set_aspect('equal')
+    ax.axis('off')
+    plt.tight_layout(pad=0)
+
+    # 4) Save and close
+    fig.savefig(out_path, dpi=dpi, bbox_inches='tight', pad_inches=0)
+    plt.close(fig)
+
+# Process a single item with proper thread safety
+def process_single_item(item, ref_strokes=None):
+    """
+    Process a single line item into handwriting strokes.
+    Thread-safe implementation using the global session.
+    """
+    text_len = max(1, len(item["line"]))
+    
+    # Build input tensors
+    x_prime, x_prime_len, chars, chars_len, max_tsteps = build_input_tensors(item, text_len)
+    
+    # Use provided reference style strokes if available
+    if ref_strokes is not None:
+        try:
+            ref_strokes = np.array(ref_strokes, dtype=np.float32)
+            x_prime = ref_strokes.reshape(1, -1, 3)
+            x_prime_len = np.array([len(ref_strokes)], dtype=np.int32)
+        except Exception as e:
+            logging.error(f"Error with reference strokes: {e}")
+            # Continue with default style
+    
+    # Use the thread lock to ensure only one thread uses the TF session at a time
+    with tf_lock:
+        # Sample handwriting sequence
+        [sampled] = style_model.session.run(
+            [style_model.sampled_sequence],
+            feed_dict={
+                style_model.prime: True,
+                style_model.x_prime: x_prime,
+                style_model.x_prime_len: x_prime_len,
+                style_model.ref_x: x_prime,
+                style_model.ref_x_len: x_prime_len,
+                style_model.num_samples: 1,
+                style_model.sample_tsteps: max_tsteps,
+                style_model.c: chars,
+                style_model.c_len: chars_len,
+                style_model.bias: [item["bias"]]
+            }
+        )
+    
+    # Strip padding rows (any all-zero rows)
+    seq = sampled[0][~np.all(sampled[0] == 0.0, axis=1)]
+    
+    # Process the stroke sequence
+    base_initial_coord = np.array([0, -30])
+    initial_coord = base_initial_coord.copy()
+    processed = process_stroke(item, seq, initial_coord)
+    
+    logging.info(f"Processed line {item['index']}")
+    return processed
 
 @app.get("/health")
 def health():
     region = os.environ.get('CLOUD_RUN_REGION', 'unknown')
     vm_name = os.environ.get('HOSTNAME', 'unknown')
-    return {
-        "message": "OK",
-        "region": region,
-        "instance": os.environ.get('K_REVISION', 'unknown'),
-        "vm": vm_name
-    }
+    return {"message": "OK", "region": region, "instance": os.environ.get('K_REVISION', 'unknown'), "vm": vm_name}
 
 @app.get("/hello")
 def hello():
     return {"message": "Hello, World!"}
 
+def save_request_data(request: MarkdownRequest, output_dir: str = "saved_requests"):
+    """
+    Save the incoming request data to a JSON file.
+    """
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate unique filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"request_{timestamp}_{uuid.uuid4().hex[:8]}.json"
+    filepath = os.path.join(output_dir, filename)
+    
+    # Convert request to dict and save
+    request_data = {
+        "markdown": request.markdown,
+        "style_id": request.style_id,
+        "ref_strokes": request.ref_strokes,
+        "timestamp": timestamp
+    }
+    
+    with open(filepath, 'w') as f:
+        json.dump(request_data, f, indent=2)
+    
+    return filepath
+
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
+    """
+    1. Parse the incoming Markdown into lines & metadata.
+    2. Compute style/bias/etc. for each line.
+    3. Process lines in parallel using thread pool.
+    4. Merge all processed lines back into the full-page strokes JSON.
+    """
+    # Save the incoming request data
     try:
-        markdown_text = request.markdown
-        lines, metadata = parse_markdown(markdown_text)
-        print("lines", lines)
-        print("metadata", metadata)
-        
-        joined_lines = "\n".join(lines)
+        saved_file = save_request_data(request)
+        logging.info(f"Saved request data to {saved_file}")
+    except Exception as e:
+        logging.error(f"Failed to save request data: {e}")
+    
+    # 1) Parse markdown → lines + metadata
+    try:
+        lines, metadata = parse_markdown(request.markdown)
+        joined = "\n".join(lines)
         styles, biases, stroke_colors, stroke_widths = metadata_to_style(
-            metadata, style_id=request.style_id, lines=joined_lines
+            metadata,
+            style_id=request.style_id,
+            lines=joined
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Style metadata error: {str(e)}")
-    
+        raise HTTPException(status_code=400, detail=f"Style metadata error: {e}")
+
+    # 2) Build per-line items
     indexed_items = []
     for i, (line, meta, bias, style, sw, sc) in enumerate(
         zip(lines, metadata, biases, styles, stroke_widths, stroke_colors)
@@ -412,76 +542,106 @@ def convert_markdown(request: MarkdownRequest):
             "stroke_color": sc
         })
 
-    # Reverse for the model input
-    indexed_items_reversed = indexed_items[::-1]
-    rev_lines = [item["line"] for item in indexed_items_reversed]
-    rev_biases = [item["bias"] for item in indexed_items_reversed]
-    rev_styles = [item["style"] for item in indexed_items_reversed]
-
-    # Call the handwriting model
+    # Determine optimal number of threads based on CPU count
+    cpu_count = os.cpu_count() or 4
+    # Use 2x CPU count for I/O bound tasks, but cap to avoid too much overhead
+    max_workers = min(cpu_count * 2, 16)
+    
+    logging.info(f"Using {max_workers} worker threads with {cpu_count} CPU cores")
+    
+    # Check if reference style strokes were provided
+    ref_strokes = request.ref_strokes
+    
+    # Process items in parallel using thread pool
     try:
-        print("rev_lines", rev_lines)
-        strokes = hand._sample(rev_lines, biases=rev_biases, styles=rev_styles)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all items to the executor
+            future_to_item = {executor.submit(process_single_item, item, ref_strokes): item 
+                            for item in indexed_items}
+            
+            # Collect results as they complete
+            processed_lines = []
+            for future in concurrent.futures.as_completed(future_to_item):
+                item = future_to_item[future]
+                try:
+                    result = future.result()
+                    processed_lines.append(result)
+                    # Log progress every 10 items
+                    if len(processed_lines) % 10 == 0:
+                        logging.info(f"Processed {len(processed_lines)}/{len(indexed_items)} items")
+                except Exception as e:
+                    logging.error(f"Processing failed for item {item['index']}: {e}")
+                    # Create a minimal placeholder for failed items
+                    processed_lines.append({
+                        "index": item["index"],
+                        "line": item["line"],
+                        "strokes": [],
+                        "stroke_width": item["stroke_width"],
+                        "stroke_color": item["stroke_color"],
+                        "metadata": item["metadata"]
+                    })
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error during handwriting synthesis: {str(e)}")
+        # Fall back to sequential processing if parallel execution fails
+        logging.error(f"Thread pool execution failed, falling back to sequential: {e}")
+        processed_lines = []
+        for item in indexed_items:
+            try:
+                processed = process_single_item(item, ref_strokes)
+                processed_lines.append(processed)
+            except Exception as item_e:
+                logging.error(f"Sequential processing failed for item {item['index']}: {item_e}")
+                processed_lines.append({
+                    "index": item["index"],
+                    "line": item["line"],
+                    "strokes": [],
+                    "stroke_width": item["stroke_width"],
+                    "stroke_color": item["stroke_color"],
+                    "metadata": item["metadata"]
+                })
+    
+    # Sort the results by index to maintain original order
+    processed_lines.sort(key=lambda x: x["index"])
 
-    base_initial_coord = np.array([0, -30])
-
-    strokes_output = []
-    with ThreadPoolExecutor() as executor:
-        futures = []
-        for idx, (item, stroke) in enumerate(zip(indexed_items_reversed, strokes)):
-            initial_coord = base_initial_coord.copy()
-            futures.append(executor.submit(process_stroke, item, stroke, initial_coord))
-
-        for future in futures:
-            strokes_output.append(future.result())
-
-    # Re-sort to original order
-    strokes_output_sorted = sorted(strokes_output, key=lambda x: x["index"])
-
-    grouped_strokes = {}
-    for entry in strokes_output_sorted:
-        group_id = entry["metadata"]["group_id"]  # from parse_markdown
-        if group_id not in grouped_strokes:
-            grouped_strokes[group_id] = {
-                "lines": [],
-                "segments": [],
-                "stroke_width": entry["stroke_width"],
-                "stroke_color": entry["stroke_color"],
-                "metadata": entry["metadata"],
-            }
-        grouped_strokes[group_id]["lines"].append(entry["line"])
-        grouped_strokes[group_id]["segments"].append(entry["strokes"])
+    # 4) Merge per-line results into full-page output
+    grouped = {}
+    for entry in sorted(processed_lines, key=lambda x: x["index"]):
+        gid = entry["metadata"]["group_id"]
+        grp = grouped.setdefault(gid, {
+            "lines": [], "segments": [],
+            "stroke_width": entry["stroke_width"],
+            "stroke_color": entry["stroke_color"],
+            "metadata": entry["metadata"]
+        })
+        grp["lines"].append(entry["line"])
+        grp["segments"].append(entry["strokes"])
 
     merged_output = []
-    for gid in sorted(grouped_strokes.keys()):
-        group = grouped_strokes[gid]
-        merged_line_text = " ".join(filter(None, group["lines"]))
+    for gid in sorted(grouped):
+        group = grouped[gid]
+        text = " ".join(filter(None, group["lines"]))
+        combined = combine_segments_as_one_line(group["segments"], spacing=20)
 
-        # chain all sub-segments horizontally
-        combined_strokes = combine_segments_as_one_line(group["segments"], spacing=20)
-
-        for stroke in combined_strokes:
+        # Vertical offset by line number
+        for stroke in combined:
             for pt in stroke:
                 pt[1] += gid * 50
 
+        # Indent if needed
         indent = group["metadata"].get("indent", 0)
-        if indent > 0:
-            for stroke in combined_strokes:
+        if indent:
+            for stroke in combined:
                 for pt in stroke:
                     pt[0] += indent * 50 + 20
 
         merged_output.append({
-            "line": merged_line_text,
-            "strokes": combined_strokes,
+            "line": text,
+            "strokes": combined,
             "stroke_width": group["stroke_width"],
-            "stroke_color": group["stroke_color"],
+            "stroke_color": group["stroke_color"]
         })
 
     return {"strokes": merged_output}
 
-
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

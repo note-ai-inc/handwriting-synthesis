@@ -1,0 +1,248 @@
+[[05/07/2025 09:39:00 PM]] 
+new run with parameters:
+{'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 10,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': <train.StyleDataReader object at 0x76da65aa7208>,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[05/07/2025 09:39:03 PM]] all parameters:
+[[05/07/2025 09:39:03 PM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[05/07/2025 09:39:03 PM]] trainable parameters:
+[[05/07/2025 09:39:03 PM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[05/07/2025 09:39:03 PM]] trainable parameter count:
+[[05/07/2025 09:39:03 PM]] 5070128
+[[05/07/2025 09:39:03 PM]] built graph
+[[05/07/2025 09:39:03 PM]] Restoring parameters from final_checkpoints/model-10350
+[[05/07/2025 09:39:03 PM]] Started server process [715]
+[[05/07/2025 09:39:03 PM]] Waiting for application startup.
+[[05/07/2025 09:39:03 PM]] Application startup complete.
+[[05/07/2025 09:40:49 PM]] Line 0 OK on attempt 1
+[[05/07/2025 09:40:50 PM]] Line 1 OK on attempt 1
+[[05/07/2025 09:40:52 PM]] Line 2 OK on attempt 1
+[[05/07/2025 09:40:55 PM]] Line 3 OK on attempt 1
+[[05/07/2025 09:40:57 PM]] Line 4 OK on attempt 1
+[[05/07/2025 09:40:59 PM]] Line 5 OK on attempt 1
+[[05/07/2025 09:41:01 PM]] Line 6 OK on attempt 1
+[[05/07/2025 09:41:03 PM]] Line 7 OK on attempt 1
+[[05/07/2025 09:41:05 PM]] Line 8 OK on attempt 1
+[[05/07/2025 09:41:07 PM]] Line 9 OK on attempt 1
+[[05/07/2025 09:41:09 PM]] Line 10 OK on attempt 1
+[[05/07/2025 09:41:11 PM]] Line 11 OK on attempt 1
+[[05/07/2025 09:41:13 PM]] Line 12 OK on attempt 1
+[[05/07/2025 09:41:15 PM]] Line 13 OK on attempt 1
+[[05/07/2025 09:41:17 PM]] Line 14 OK on attempt 1
+[[05/07/2025 09:41:18 PM]] Line 15 OK on attempt 1
+[[05/07/2025 09:41:19 PM]] Line 16 OK on attempt 1
+[[05/07/2025 09:41:21 PM]] Line 17 OK on attempt 1
+[[05/07/2025 09:41:24 PM]] Line 18 OK on attempt 1
+[[05/07/2025 09:41:25 PM]] Line 19 OK on attempt 1
+[[05/07/2025 09:41:27 PM]] Line 20 OK on attempt 1
+[[05/07/2025 09:41:29 PM]] Line 21 OK on attempt 1
+[[05/07/2025 09:41:32 PM]] Line 22 OK on attempt 1
+[[05/07/2025 09:41:34 PM]] Line 23 OK on attempt 1
+[[05/07/2025 09:41:37 PM]] Line 24 OK on attempt 1
+[[05/07/2025 09:41:38 PM]] Line 25 OK on attempt 1
+[[05/07/2025 09:41:40 PM]] Line 26 OK on attempt 1
+[[05/07/2025 09:41:43 PM]] Line 27 OK on attempt 1
+[[05/07/2025 09:41:46 PM]] Line 28 OK on attempt 1
+[[05/07/2025 09:41:51 PM]] Line 29 OK on attempt 1
+[[05/07/2025 09:41:52 PM]] Line 0 OK on attempt 1
+[[05/07/2025 09:41:55 PM]] Line 1 OK on attempt 1
+[[05/07/2025 09:41:58 PM]] Line 30 OK on attempt 1
+[[05/07/2025 09:41:59 PM]] Line 2 OK on attempt 1
+[[05/07/2025 09:42:02 PM]] Line 31 OK on attempt 1
+[[05/07/2025 09:42:02 PM]] Line 3 OK on attempt 1
+[[05/07/2025 09:42:05 PM]] Line 4 OK on attempt 1
+[[05/07/2025 09:42:07 PM]] Line 5 OK on attempt 1
+[[05/07/2025 09:42:09 PM]] Line 6 OK on attempt 1
+[[05/07/2025 09:42:11 PM]] Line 7 OK on attempt 1
+[[05/07/2025 09:42:13 PM]] Line 8 OK on attempt 1
+[[05/07/2025 09:42:15 PM]] Line 9 OK on attempt 1
+[[05/07/2025 09:42:16 PM]] Line 10 OK on attempt 1
+[[05/07/2025 09:42:18 PM]] Line 11 OK on attempt 1
+[[05/07/2025 09:42:20 PM]] Line 12 OK on attempt 1
+[[05/07/2025 09:42:22 PM]] Line 13 OK on attempt 1
+[[05/07/2025 09:42:23 PM]] Line 14 OK on attempt 1
+[[05/07/2025 09:42:25 PM]] Line 15 OK on attempt 1
+[[05/07/2025 09:42:27 PM]] Line 16 OK on attempt 1
+[[05/07/2025 09:42:29 PM]] Line 17 OK on attempt 1
+[[05/07/2025 09:42:31 PM]] Line 18 OK on attempt 1
+[[05/07/2025 09:42:32 PM]] Line 19 OK on attempt 1
+[[05/07/2025 09:42:34 PM]] Line 20 OK on attempt 1
+[[05/07/2025 09:42:36 PM]] Line 21 OK on attempt 1
+[[05/07/2025 09:42:38 PM]] Line 22 OK on attempt 1
+[[05/07/2025 09:42:41 PM]] Line 23 OK on attempt 1
+[[05/07/2025 09:42:43 PM]] Line 24 OK on attempt 1
+[[05/07/2025 09:42:44 PM]] Line 25 OK on attempt 1
+[[05/07/2025 09:42:48 PM]] Line 26 OK on attempt 1
+[[05/07/2025 09:42:51 PM]] Line 0 OK on attempt 1
+[[05/07/2025 09:42:51 PM]] Line 27 OK on attempt 1
+[[05/07/2025 09:42:54 PM]] Line 1 OK on attempt 1
+[[05/07/2025 09:42:58 PM]] Line 2 OK on attempt 1
+[[05/07/2025 09:42:59 PM]] Line 28 OK on attempt 1
+[[05/07/2025 09:43:03 PM]] Line 3 OK on attempt 1
+[[05/07/2025 09:43:04 PM]] Line 29 OK on attempt 1
+[[05/07/2025 09:43:08 PM]] Line 4 OK on attempt 1
+[[05/07/2025 09:43:08 PM]] Line 30 OK on attempt 1
+[[05/07/2025 09:43:09 PM]] Line 5 OK on attempt 1
+[[05/07/2025 09:43:11 PM]] Line 31 OK on attempt 1
+[[05/07/2025 09:43:11 PM]] Line 6 OK on attempt 1
+[[05/07/2025 09:43:12 PM]] Line 7 OK on attempt 1
+[[05/07/2025 09:43:13 PM]] Line 8 OK on attempt 1
+[[05/07/2025 09:43:14 PM]] Line 9 OK on attempt 1
+[[05/07/2025 09:43:15 PM]] Line 10 OK on attempt 1
+[[05/07/2025 09:43:16 PM]] Line 11 OK on attempt 1
+[[05/07/2025 09:43:18 PM]] Line 12 OK on attempt 1
+[[05/07/2025 09:43:19 PM]] Line 13 OK on attempt 1
+[[05/07/2025 09:43:20 PM]] Line 14 OK on attempt 1
+[[05/07/2025 09:43:21 PM]] Line 15 OK on attempt 1
+[[05/07/2025 09:43:22 PM]] Line 16 OK on attempt 1
+[[05/07/2025 09:43:23 PM]] Line 17 OK on attempt 1
+[[05/07/2025 09:43:24 PM]] Line 18 OK on attempt 1
+[[05/07/2025 09:43:25 PM]] Line 19 OK on attempt 1
+[[05/07/2025 09:43:26 PM]] Line 20 OK on attempt 1
+[[05/07/2025 09:43:27 PM]] Line 21 OK on attempt 1
+[[05/07/2025 09:43:28 PM]] Line 22 OK on attempt 1
+[[05/07/2025 09:43:29 PM]] Line 23 OK on attempt 1
+[[05/07/2025 09:43:31 PM]] Line 24 OK on attempt 1
+[[05/07/2025 09:43:31 PM]] Line 25 OK on attempt 1
+[[05/07/2025 09:43:32 PM]] Line 26 OK on attempt 1
+[[05/07/2025 09:43:34 PM]] Line 27 OK on attempt 1
+[[05/07/2025 09:43:37 PM]] Line 28 OK on attempt 1
+[[05/07/2025 09:43:39 PM]] Line 29 OK on attempt 1
+[[05/07/2025 09:43:40 PM]] Shutting down
+[[05/07/2025 09:43:40 PM]] Waiting for connections to close. (CTRL+C to force quit)
+[[05/07/2025 09:43:42 PM]] Line 30 OK on attempt 1
+[[05/07/2025 09:43:44 PM]] Line 31 OK on attempt 1
+[[05/07/2025 09:43:44 PM]] Waiting for application shutdown.
+[[05/07/2025 09:43:44 PM]] Application shutdown complete.
+[[05/07/2025 09:43:44 PM]] Finished server process [715]
