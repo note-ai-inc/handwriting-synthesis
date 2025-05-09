@@ -207,7 +207,7 @@ class rnn(TFBaseModel):
 
 
 if __name__ == '__main__':
-    dr = DataReader(data_dir='data/processeed/')
+    dr = DataReader(data_dir='processedFiles/')
 
     nn = rnn(
         reader=dr,

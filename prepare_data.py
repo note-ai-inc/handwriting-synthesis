@@ -124,11 +124,11 @@ if __name__ == '__main__':
 
         w_id[i] = w_id_i
 
-    if not os.path.isdir('data/processeed'):
-        os.makedirs('data/processeed')
+    if not os.path.isdir('processedFiles'):
+        os.makedirs('processedFiles')
 
-    np.save('data/processeed/x.npy', x[valid_mask])
-    np.save('data/processeed/x_len.npy', x_len[valid_mask])
-    np.save('data/processeed/c.npy', c[valid_mask])
-    np.save('data/processeed/c_len.npy', c_len[valid_mask])
-    np.save('data/processeed/w_id.npy', w_id[valid_mask])
+    np.save('processedFiles/x.npy', x[valid_mask])
+    np.save('processedFiles/x_len.npy', x_len[valid_mask])
+    np.save('processedFiles/c.npy', c[valid_mask])
+    np.save('processedFiles/c_len.npy', c_len[valid_mask])
+    np.save('processedFiles/w_id.npy', w_id[valid_mask])
