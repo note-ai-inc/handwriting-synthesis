@@ -46,7 +46,14 @@ class StyleSynthesisModel(TFBaseModel):
         self.attention_mixture_components = attention_mixture_components
         self.style_embedding_size = style_embedding_size
         self.output_units = self.output_mixture_components * 6 + 1
-        super(StyleSynthesisModel, self).__init__(**kwargs)
+        
+        # Only pass reader to parent if it's provided
+        if 'reader' in kwargs:
+            super(StyleSynthesisModel, self).__init__(**kwargs)
+        else:
+            # Remove reader from kwargs for inference
+            kwargs.pop('reader', None)
+            super(StyleSynthesisModel, self).__init__(reader=None, **kwargs)
 
     def calculate_loss(self):
         self.x = tf.placeholder(tf.float32, [None, None, 3], name="x")

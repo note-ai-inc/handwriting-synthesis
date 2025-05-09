@@ -72,8 +72,10 @@ class TFBaseModel(object):
         checkpoint_dir='checkpoints',
         prediction_dir='predictions',
     ):
-
-        assert len(batch_sizes) == len(learning_rates) == len(patiences)
+        # Only validate batch sizes if we have a reader (training mode)
+        if reader is not None:
+            assert len(batch_sizes) == len(learning_rates) == len(patiences)
+        
         self.batch_sizes = batch_sizes
         self.learning_rates = learning_rates
         self.beta1_decays = beta1_decays
