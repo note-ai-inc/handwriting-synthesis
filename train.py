@@ -284,7 +284,7 @@ def visualize_after_training(model, reader, out_dir="style_viz"):
 # Main
 ################################################################################
 def main():
-    data_dir = "data/processed"  # adapt to your location
+    data_dir = "data/processeed"  # adapt to your location
     reader = StyleDataReader(data_dir)
 
     model = StyleSynthesisModel(

@@ -60,7 +60,7 @@ class MarkdownRequest(BaseModel):
     ref_strokes: Optional[list] = None
 
 # Set up the model
-DATA_DIR = "data/processed"
+DATA_DIR = "data/processeed"
 reader = StyleDataReader(DATA_DIR)
 style_model = StyleSynthesisModel(
     reader=reader,

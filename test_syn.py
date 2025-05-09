@@ -14,7 +14,7 @@ np.random.seed(42)
 tf.set_random_seed(42)
 
 def test_model():
-    data_dir = "data/processed"
+    data_dir = "data/processeed"
     reader = StyleDataReader(data_dir)
 
     model = StyleSynthesisModel(
