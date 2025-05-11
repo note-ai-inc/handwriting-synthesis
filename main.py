@@ -22,21 +22,7 @@ from functools import partial
 import json
 from datetime import datetime
 
-# But without complex multiprocessing that causes session issues
-config = tf.ConfigProto(
-    intra_op_parallelism_threads=4,  # Use fixed value
-    inter_op_parallelism_threads=4,  # Use fixed value
-    allow_soft_placement=True
-)
-# Use a single global session that can be shared across threads (but not processes)
-session = tf.Session(config=config)
-tf.keras.backend.set_session(session)
-
-# Set seeds for determinism
-random.seed(42)
-np.random.seed(42)
-tf.set_random_seed(42)
-
+# Initialize FastAPI app first so we can respond to health checks immediately
 app = FastAPI()
 
 # Allow requests from your HTML server
@@ -53,6 +39,97 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global variables for lazy loading
+style_model = None
+tf_lock = threading.RLock()
+model_initialized = False
+model_initialization_error = None
+
+def initialize_model():
+    """Lazy initialization of the model"""
+    global style_model, model_initialized, model_initialization_error
+    
+    if model_initialized:
+        return
+        
+    try:
+        # Set up the model
+        style_model = StyleSynthesisModel(
+            log_dir="logs_style_synthesis",
+            checkpoint_dir="checkpoints_style_synthesis",
+            prediction_dir="predictions_style_synthesis",
+            learning_rates=[1e-4],
+            batch_sizes=[32],
+            patiences=[2000],
+            beta1_decays=[0.9],
+            validation_batch_size=32,
+            optimizer='rms',
+            num_training_steps=30000,
+            regularization_constant=0.0,
+            keep_prob=1.0,
+            enable_parameter_averaging=False,
+            min_steps_to_checkpoint=2000,
+            log_interval=50,
+            grad_clip=10,
+            lstm_size=400,
+            output_mixture_components=20,
+            attention_mixture_components=10,
+            style_embedding_size=256
+        )
+
+        # Configure TensorFlow session
+        config = tf.ConfigProto(
+            intra_op_parallelism_threads=4,
+            inter_op_parallelism_threads=4,
+            allow_soft_placement=True
+        )
+        session = tf.Session(config=config)
+        tf.keras.backend.set_session(session)
+
+        # Set seeds for determinism
+        random.seed(42)
+        np.random.seed(42)
+        tf.set_random_seed(42)
+
+        # Restore from checkpoint
+        checkpoint_path = "final_checkpoints/model-10350"
+        style_model.saver.restore(style_model.session, checkpoint_path)
+
+        # Set deterministic sampling
+        style_model.sampling_mode = "deterministic"
+        style_model.force_deterministic_sampling = True
+        style_model.temperature = 0.5
+
+        model_initialized = True
+        logging.info("Model initialized successfully")
+        
+    except Exception as e:
+        model_initialization_error = str(e)
+        logging.error(f"Failed to initialize model: {e}")
+        raise
+
+@app.get("/health")
+def health():
+    """Health check endpoint that responds immediately"""
+    if not model_initialized and not model_initialization_error:
+        # Start model initialization in background if not started
+        try:
+            threading.Thread(target=initialize_model, daemon=True).start()
+            return {"status": "initializing", "message": "Model initialization started"}
+        except Exception as e:
+            return {"status": "error", "message": f"Failed to start initialization: {str(e)}"}
+    
+    if model_initialization_error:
+        return {"status": "error", "message": f"Model initialization failed: {model_initialization_error}"}
+        
+    return {
+        "status": "healthy",
+        "message": "OK",
+        "region": os.environ.get('CLOUD_RUN_REGION', 'unknown'),
+        "instance": os.environ.get('K_REVISION', 'unknown'),
+        "vm": os.environ.get('HOSTNAME', 'unknown')
+    }
 
 class MarkdownRequest(BaseModel):
     markdown: str
@@ -461,12 +538,6 @@ def process_single_item(item, ref_strokes=None):
     logging.info(f"Processed line {item['index']}")
     return processed
 
-@app.get("/health")
-def health():
-    region = os.environ.get('CLOUD_RUN_REGION', 'unknown')
-    vm_name = os.environ.get('HOSTNAME', 'unknown')
-    return {"message": "OK", "region": region, "instance": os.environ.get('K_REVISION', 'unknown'), "vm": vm_name}
-
 @app.get("/hello")
 def hello():
     return {"message": "Hello, World!"}
@@ -498,12 +569,18 @@ def save_request_data(request: MarkdownRequest, output_dir: str = "saved_request
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
-    """
-    1. Parse the incoming Markdown into lines & metadata.
-    2. Compute style/bias/etc. for each line.
-    3. Process lines in parallel using thread pool.
-    4. Merge all processed lines back into the full-page strokes JSON.
-    """
+    """Convert markdown to handwriting with lazy model initialization"""
+    global style_model, model_initialized
+    
+    # Ensure model is initialized
+    if not model_initialized:
+        if model_initialization_error:
+            raise HTTPException(status_code=500, detail=f"Model initialization failed: {model_initialization_error}")
+        try:
+            initialize_model()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to initialize model: {str(e)}")
+    
     # Save the incoming request data
     try:
         saved_file = save_request_data(request)
