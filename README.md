@@ -1,120 +1,160 @@
-# Handwriting Synthesis API - Integration Guide
+# Handwriting Synthesis and Quality Analysis Services
 
-## API Endpoint
+This repository contains two microservices that work together to provide handwriting synthesis and quality analysis capabilities:
+
+1. **Handwriting Synthesis Service** (`main.py`)
+2. **Handwriting Quality Analysis Service** (`gemini_image_compare.py`)
+
+## Overview
+
+### Handwriting Synthesis Service
+
+The Handwriting Synthesis Service converts markdown text into handwritten strokes using a machine learning model. It supports both default style-based generation and reference stroke-based generation.
+
+**Key Features:**
+- Converts markdown text to handwritten strokes
+- Supports multiple handwriting styles
+- Maintains markdown formatting (headers, lists, indentation)
+- Parallel processing for better performance
+- Quality control with reference strokes
+
+**API Endpoints:**
+- `POST /convert`: Converts markdown to handwritten strokes
+  - Input: Markdown text, style ID, and optional reference strokes
+  - Output: Sequence of handwritten strokes
+- `GET /health`: Health check endpoint
+- `GET /hello`: Simple test endpoint
+
+### Handwriting Quality Analysis Service
+
+The Handwriting Quality Analysis Service uses Google's Gemini AI model to analyze handwriting quality and extract text from handwritten images.
+
+**Key Features:**
+- Handwriting quality assessment
+- Text extraction from handwritten images
+- Multiple image comparison
+- Integration with Google's Gemini AI
+
+**API Endpoints:**
+- `POST /check_handwriting`: Evaluates handwriting quality
+  - Input: Handwritten image
+  - Output: Quality assessment (true/false)
+- `POST /extract_text`: Extracts text from handwritten images
+  - Input: Handwritten image
+  - Output: Extracted text
+- `POST /compare_images`: Compares multiple handwritten images
+  - Input: Multiple handwritten images
+  - Output: Comparison analysis
+- `GET /health`: Health check endpoint
+
+## Setup and Installation
+
+### Prerequisites
+- Python 3.7+
+- TensorFlow
+- FastAPI
+- Flask
+- Google Cloud credentials (for Gemini API)
+- Other dependencies listed in requirements.txt
+
+### Environment Variables
+```bash
+# Required for Gemini service
+GOOGLE_API_KEY=your_google_api_key
+
+# Optional configurations
+PORT=8080  # For handwriting synthesis service
+GEMINI_SERVICE_URL=http://handwriting-quality:5000  # URL for quality service
 ```
-POST /convert
+
+### Installation
+1. Clone the repository
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
-## Request Format
-```typescript
-interface MarkdownRequest {
-    markdown: string;          // The text to convert to handwriting
-    style_id?: number;         // Optional: Predefined style ID (default: 8)
-    ref_strokes?: Stroke[];    // Optional: Custom reference strokes for style
-}
+## Running the Services
 
-interface Stroke {
-    x: float;      // x-coordinate (normalized between -1 and 1)
-    y: float;      // y-coordinate (normalized between -1 and 1)
-    eos: number;   // end-of-stroke marker (1 for start of stroke, 0 for continuation)
-}
+### Handwriting Synthesis Service
+```bash
+python main.py
+```
+The service will start on port 8080 by default.
+
+### Handwriting Quality Analysis Service
+```bash
+python gemini_image_compare.py
+```
+The service will start on port 5000 by default.
+
+## API Usage Examples
+
+### Converting Markdown to Handwriting
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8080/convert",
+    json={
+        "markdown": "# Hello World\nThis is a test",
+        "style_id": 8,
+        "ref_strokes": None  # Optional reference strokes
+    }
+)
 ```
 
-## Example Request
-```json
-{
-    "markdown": "Hello World",
-    "ref_strokes": [
-        // First stroke
-        {"x": 0.0, "y": 0.0, "eos": 1},        // Start of first stroke
-        {"x": -0.011367, "y": 0.05825589, "eos": 0},   // Middle of stroke
-        {"x": -0.03552188, "y": 0.12929966, "eos": 0},   // Middle of stroke
-        {"x": -0.06393939, "y": 0.17760941, "eos": 0},   // Middle of stroke
-        {"x": -0.12219528, "y": 0.22165656, "eos": 0},   // End of first stroke
-        
-        // Second stroke
-        {"x": -0.13640404, "y": 0.2017643, "eos": 1},   // Start of second stroke
-        {"x": -0.2585993, "y": 0.24296969, "eos": 0},   // Middle of stroke
-        {"x": -0.3239596, "y": 0.26854545, "eos": 0},   // Middle of stroke
-        {"x": -0.41205385, "y": 0.30406734, "eos": 0}    // End of second stroke
-    ]
-}
+### Checking Handwriting Quality
+```python
+import requests
+
+with open("handwriting.png", "rb") as f:
+    response = requests.post(
+        "http://localhost:5000/check_handwriting",
+        files={"image": f}
+    )
 ```
 
-## Response Format
-```typescript
-interface Response {
-    strokes: StrokeGroup[];
-}
+### Extracting Text from Handwriting
+```python
+import requests
 
-interface StrokeGroup {
-    line: string;              // The text line
-    strokes: Point[][];        // Array of strokes, each stroke is array of points
-    stroke_width: number;      // Width of the stroke
-    stroke_color: string;      // Color of the stroke
-}
-
-interface Point {
-    x: float;     // x-coordinate
-    y: float;     // y-coordinate
-}
+with open("handwriting.png", "rb") as f:
+    response = requests.post(
+        "http://localhost:5000/extract_text",
+        files={"image": f}
+    )
 ```
 
-## Important Notes
+## Architecture
 
-1. **Stroke Data Format**:
-   - Each point must have x, y coordinates and an eos marker
-   - x and y coordinates must be float values
-   - Coordinates must be normalized between -1 and 1
-   - eos = 1 indicates start of a new stroke
-   - eos = 0 indicates continuation of the current stroke
-   - Strokes should be in the order they were written
-   - Typical stroke data contains 400-500 points
+The system uses a microservices architecture:
+1. The Handwriting Synthesis Service handles the conversion of text to handwriting
+2. The Handwriting Quality Analysis Service provides quality assessment and text extraction
+3. Services communicate via HTTP APIs
+4. The Gemini AI model is used for quality analysis and text extraction
 
-2. **Coordinate System**:
-   - x-coordinates (float) typically range from -1.3 to 0
-   - y-coordinates (float) typically range from -0.6 to 0.9
-   - All coordinates should be normalized to this range
-   - Maintain relative proportions when normalizing
-   - Use float precision for coordinates (e.g., -0.011367, 0.05825589)
+## Error Handling
 
-3. **Stroke Collection Guidelines**:
-   - Collect points continuously as the user writes
-   - Mark the start of each new stroke with eos = 1
-   - Mark all other points with eos = 0
-   - Maintain the natural writing order
-   - Store points in sequence as they are drawn
+Both services implement comprehensive error handling:
+- Input validation
+- File processing errors
+- API communication errors
+- Model inference errors
+- Proper error responses with status codes
 
-4. **Implementation Tips**:
-   - Normalize coordinates before sending to API
-   - Use a data structure to store points in sequence
-   - Track the current stroke and all completed strokes
-   - Clear stroke data after successful API calls
-   - Implement proper error handling
+## Logging
 
-5. **Error Handling**:
-   - Handle API errors appropriately
-   - Validate stroke data before sending
-   - Provide feedback to users if stroke collection fails
-   - Check for network connectivity
-   - Handle timeouts and retries
+Both services implement detailed logging:
+- Request/response logging
+- Error logging
+- Performance metrics
+- Debug information
 
-6. **Best Practices**:
-   - Collect strokes in real-time as the user writes
-   - Maintain stroke order and timing
-   - Clear stroke data after successful API calls
-   - Implement proper error handling and user feedback
-   - Consider implementing a stroke preview feature
-   - Optimize network calls by batching strokes if needed
-   - Cache successful results when appropriate
+## Contributing
 
-## CORS Configuration
-The API is configured to accept requests from:
-- http://127.0.0.1:5500
-- http://localhost:5500
-- All origins (*)
-
-Make sure your application's origin is included in the allowed origins list.
-
-
-# Dummy line
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
