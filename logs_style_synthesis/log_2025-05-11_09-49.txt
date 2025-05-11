@@ -1,0 +1,1564 @@
+[[05/11/2025 09:49:01 AM]] 
+new run with parameters:
+{'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 10,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': <train.StyleDataReader object at 0x7924564bca58>,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[05/11/2025 09:49:04 AM]] all parameters:
+[[05/11/2025 09:49:04 AM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[05/11/2025 09:49:04 AM]] trainable parameters:
+[[05/11/2025 09:49:04 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[05/11/2025 09:49:04 AM]] trainable parameter count:
+[[05/11/2025 09:49:04 AM]] 5070128
+[[05/11/2025 09:49:04 AM]] built graph
+[[05/11/2025 09:49:04 AM]] Restoring parameters from final_checkpoints/model-10350
+[[05/11/2025 09:49:04 AM]] Started server process [2118]
+[[05/11/2025 09:49:04 AM]] Waiting for application startup.
+[[05/11/2025 09:49:04 AM]] Application startup complete.
+[[05/11/2025 09:49:09 AM]] Shutting down
+[[05/11/2025 09:49:09 AM]] Waiting for application shutdown.
+[[05/11/2025 09:49:09 AM]] Application shutdown complete.
+[[05/11/2025 09:49:09 AM]] Finished server process [2118]
+[[05/11/2025 09:49:12 AM]] 
+new run with parameters:
+{'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 10,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': <train.StyleDataReader object at 0x7bf40dfb2a58>,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[05/11/2025 09:49:14 AM]] all parameters:
+[[05/11/2025 09:49:14 AM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[05/11/2025 09:49:14 AM]] trainable parameters:
+[[05/11/2025 09:49:14 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[05/11/2025 09:49:14 AM]] trainable parameter count:
+[[05/11/2025 09:49:14 AM]] 5070128
+[[05/11/2025 09:49:14 AM]] built graph
+[[05/11/2025 09:49:14 AM]] Restoring parameters from final_checkpoints/model-10350
+[[05/11/2025 09:49:14 AM]] Started server process [2203]
+[[05/11/2025 09:49:14 AM]] Waiting for application startup.
+[[05/11/2025 09:49:14 AM]] Application startup complete.
+[[05/11/2025 09:49:31 AM]] Saved request data to saved_requests/request_20250511_094931_2c89c4d7.json
+[[05/11/2025 09:49:31 AM]] Using 16 worker threads with 32 CPU cores
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Using normalized reference strokes with shape (1, 1025, 3), x range: -20.00 to 20.00, y range: -2.80 to 2.80
+[[05/11/2025 09:49:31 AM]] Processing failed for item 3: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:32 AM]] Processing failed for item 0: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:32 AM]] Processing failed for item 1: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:33 AM]] Processing failed for item 2: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:33 AM]] Processing failed for item 5: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:34 AM]] Processing failed for item 4: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:34 AM]] Processing failed for item 9: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:35 AM]] Processing failed for item 8: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:35 AM]] Processing failed for item 7: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:36 AM]] Processing failed for item 6: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:36 AM]] Processing failed for item 10: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:37 AM]] Processing failed for item 13: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:37 AM]] Processing failed for item 12: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:37 AM]] Processing failed for item 11: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:49:38 AM]] Processing failed for item 14: TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+Caused by op 'cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3', defined at:
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 105, in spawn_main
+    exitcode = _main(fd)
+  File "/usr/local/lib/python3.6/multiprocessing/spawn.py", line 118, in _main
+    return self._bootstrap()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 69, in run
+    return asyncio.get_event_loop().run_until_complete(self.serve(sockets=sockets))
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 475, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 442, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.6/asyncio/base_events.py", line 1462, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/server.py", line 76, in serve
+    config.load()
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/config.py", line 456, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/usr/local/lib/python3.6/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 994, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 971, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 955, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 665, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "./main.py", line 86, in <module>
+    style_embedding_size=256
+  File "./train.py", line 52, in __init__
+    super(StyleSynthesisModel, self).__init__(**kwargs)
+  File "./tf_base_model.py", line 110, in __init__
+    self.graph = self.build_graph()
+  File "./tf_base_model.py", line 401, in build_graph
+    self.loss = self.calculate_loss()
+  File "./train.py", line 115, in calculate_loss
+    lambda: self.unprimed_sample(cell)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/util/deprecation.py", line 432, in new_func
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 2018, in cond
+    orig_res_t, res_t = context_t.BuildCondBranch(true_fn)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py", line 1868, in BuildCondBranch
+    original_result = fn()
+  File "./train.py", line 114, in <lambda>
+    lambda: self.primed_sample(cell),
+  File "./train.py", line 188, in primed_sample
+    scope="rnn_style"
+  File "./rnn_ops.py", line 246, in rnn_free_run
+    states, outputs, final_state = raw_rnn(cell, loop_fn, scope=scope)
+  File "./rnn_ops.py", line 176, in raw_rnn
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "./rnn_ops.py", line 176, in <listcomp>
+    flat_outputs = [array_ops.transpose(ta.stack(), (1, 0, 2)) for ta in flat_outputs]
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 893, in stack
+    return self._implementation.stack(name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 291, in stack
+    return self.gather(math_ops.range(0, self.size()), name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/tensor_array_ops.py", line 305, in gather
+    element_shape=element_shape)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/ops/gen_data_flow_ops.py", line 4186, in _tensor_array_gather_v3
+    flow_in=flow_in, dtype=dtype, element_shape=element_shape, name=name)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/usr/local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+UnimplementedError (see above for traceback): TensorArray has size zero, but element shape [?,3] is not fully defined. Currently only static shapes are supported when packing zero-size TensorArrays.
+	 [[Node: cond/rnn_style_2/TensorArrayStack_11/TensorArrayGatherV3 = TensorArrayGatherV3[_class=["loc:@cond/rnn_style_2/rnn_output_0"], dtype=DT_FLOAT, element_shape=[?,3], _device="/job:localhost/replica:0/task:0/device:CPU:0"](cond/rnn_style_2/rnn_output_0, cond/rnn_style_2/TensorArrayStack_11/range, cond/rnn_style_2/while/Exit_14)]]
+
+[[05/11/2025 09:50:01 AM]] Shutting down
+[[05/11/2025 09:50:01 AM]] Waiting for application shutdown.
+[[05/11/2025 09:50:01 AM]] Application shutdown complete.
+[[05/11/2025 09:50:01 AM]] Finished server process [2203]

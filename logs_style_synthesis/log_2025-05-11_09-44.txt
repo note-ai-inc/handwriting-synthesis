@@ -1,0 +1,213 @@
+[[05/11/2025 09:44:21 AM]] 
+new run with parameters:
+{'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 10,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': <train.StyleDataReader object at 0x7228ae7e9828>,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[05/11/2025 09:44:23 AM]] all parameters:
+[[05/11/2025 09:44:23 AM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[05/11/2025 09:44:23 AM]] trainable parameters:
+[[05/11/2025 09:44:23 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[05/11/2025 09:44:23 AM]] trainable parameter count:
+[[05/11/2025 09:44:23 AM]] 5070128
+[[05/11/2025 09:44:23 AM]] built graph
+[[05/11/2025 09:44:23 AM]] Restoring parameters from final_checkpoints/model-10350
+[[05/11/2025 09:44:23 AM]] Started server process [1447]
+[[05/11/2025 09:44:23 AM]] Waiting for application startup.
+[[05/11/2025 09:44:23 AM]] Application startup complete.
+[[05/11/2025 09:44:30 AM]] Saved request data to saved_requests/request_20250511_094430_062a0320.json
+[[05/11/2025 09:44:30 AM]] Using 16 worker threads with 32 CPU cores
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:30 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:31 AM]] Processed line 0
+[[05/11/2025 09:44:32 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:32 AM]] Processed line 2
+[[05/11/2025 09:44:32 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:33 AM]] Processed line 1
+[[05/11/2025 09:44:33 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:34 AM]] Processed line 3
+[[05/11/2025 09:44:34 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:34 AM]] Processed line 8
+[[05/11/2025 09:44:34 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:35 AM]] Processed line 7
+[[05/11/2025 09:44:35 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:35 AM]] Processed line 5
+[[05/11/2025 09:44:35 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:36 AM]] Processed line 6
+[[05/11/2025 09:44:36 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:37 AM]] Processed line 4
+[[05/11/2025 09:44:37 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:38 AM]] Processed line 9
+[[05/11/2025 09:44:38 AM]] Processed 10/29 items
+[[05/11/2025 09:44:38 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:39 AM]] Processed line 10
+[[05/11/2025 09:44:39 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:39 AM]] Processed line 14
+[[05/11/2025 09:44:39 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:40 AM]] Processed line 11
+[[05/11/2025 09:44:40 AM]] Using reference strokes with shape (1, 1025, 3)
+[[05/11/2025 09:44:41 AM]] Processed line 13
+[[05/11/2025 09:44:41 AM]] Processed line 12
+[[05/11/2025 09:44:42 AM]] Processed line 15
+[[05/11/2025 09:44:43 AM]] Processed line 16
+[[05/11/2025 09:44:44 AM]] Processed line 17
+[[05/11/2025 09:44:45 AM]] Processed line 18
+[[05/11/2025 09:44:45 AM]] Processed line 19
+[[05/11/2025 09:44:45 AM]] Processed 20/29 items
+[[05/11/2025 09:44:46 AM]] Processed line 20
+[[05/11/2025 09:44:47 AM]] Processed line 21
+[[05/11/2025 09:44:48 AM]] Processed line 22
+[[05/11/2025 09:44:48 AM]] Processed line 23
+[[05/11/2025 09:44:49 AM]] Processed line 24
+[[05/11/2025 09:44:50 AM]] Processed line 25
+[[05/11/2025 09:44:51 AM]] Processed line 26
+[[05/11/2025 09:44:52 AM]] Processed line 27
+[[05/11/2025 09:44:52 AM]] Processed line 28
+[[05/11/2025 09:45:26 AM]] Shutting down
+[[05/11/2025 09:45:26 AM]] Waiting for application shutdown.
+[[05/11/2025 09:45:26 AM]] Application shutdown complete.
+[[05/11/2025 09:45:26 AM]] Finished server process [1447]

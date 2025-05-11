@@ -21,8 +21,28 @@ import concurrent.futures
 from functools import partial
 import json
 from datetime import datetime
+import requests
+import io
+from PIL import Image
 
-# Initialize FastAPI app first so we can respond to health checks immediately
+# Add environment variable for handwriting quality service URL
+GEMINI_SERVICE_URL = os.getenv('GEMINI_SERVICE_URL', 'http://handwriting-quality:5000')
+
+# But without complex multiprocessing that causes session issues
+config = tf.ConfigProto(
+    intra_op_parallelism_threads=4,  # Use fixed value
+    inter_op_parallelism_threads=4,  # Use fixed value
+    allow_soft_placement=True
+)
+# Use a single global session that can be shared across threads (but not processes)
+session = tf.Session(config=config)
+tf.keras.backend.set_session(session)
+
+# Set seeds for determinism
+random.seed(42)
+np.random.seed(42)
+tf.set_random_seed(42)
+
 app = FastAPI()
 
 # Allow requests from your HTML server
@@ -40,104 +60,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global variables for lazy loading
-style_model = None
-tf_lock = threading.RLock()
-model_initialized = False
-model_initialization_error = None
-
-def initialize_model():
-    """Lazy initialization of the model"""
-    global style_model, model_initialized, model_initialization_error
-    
-    if model_initialized:
-        return
-        
-    try:
-        # Set up the model
-        style_model = StyleSynthesisModel(
-            log_dir="logs_style_synthesis",
-            checkpoint_dir="checkpoints_style_synthesis",
-            prediction_dir="predictions_style_synthesis",
-            learning_rates=[1e-4],
-            batch_sizes=[32],
-            patiences=[2000],
-            beta1_decays=[0.9],
-            validation_batch_size=32,
-            optimizer='rms',
-            num_training_steps=30000,
-            regularization_constant=0.0,
-            keep_prob=1.0,
-            enable_parameter_averaging=False,
-            min_steps_to_checkpoint=2000,
-            log_interval=50,
-            grad_clip=10,
-            lstm_size=400,
-            output_mixture_components=20,
-            attention_mixture_components=10,
-            style_embedding_size=256
-        )
-
-        # Configure TensorFlow session
-        config = tf.ConfigProto(
-            intra_op_parallelism_threads=4,
-            inter_op_parallelism_threads=4,
-            allow_soft_placement=True
-        )
-        session = tf.Session(config=config)
-        tf.keras.backend.set_session(session)
-
-        # Set seeds for determinism
-        random.seed(42)
-        np.random.seed(42)
-        tf.set_random_seed(42)
-
-        # Restore from checkpoint
-        checkpoint_path = "final_checkpoints/model-10350"
-        style_model.saver.restore(style_model.session, checkpoint_path)
-
-        # Set deterministic sampling
-        style_model.sampling_mode = "deterministic"
-        style_model.force_deterministic_sampling = True
-        style_model.temperature = 0.5
-
-        model_initialized = True
-        logging.info("Model initialized successfully")
-        
-    except Exception as e:
-        model_initialization_error = str(e)
-        logging.error(f"Failed to initialize model: {e}")
-        raise
-
-@app.get("/health")
-def health():
-    """Health check endpoint that responds immediately"""
-    if not model_initialized and not model_initialization_error:
-        # Start model initialization in background if not started
-        try:
-            threading.Thread(target=initialize_model, daemon=True).start()
-            return {"status": "initializing", "message": "Model initialization started"}
-        except Exception as e:
-            return {"status": "error", "message": f"Failed to start initialization: {str(e)}"}
-    
-    if model_initialization_error:
-        return {"status": "error", "message": f"Model initialization failed: {model_initialization_error}"}
-        
-    return {
-        "status": "healthy",
-        "message": "OK",
-        "region": os.environ.get('CLOUD_RUN_REGION', 'unknown'),
-        "instance": os.environ.get('K_REVISION', 'unknown'),
-        "vm": os.environ.get('HOSTNAME', 'unknown')
-    }
-
 class MarkdownRequest(BaseModel):
     markdown: str
     style_id: Optional[int] = 8  # Default style id if not provided
     ref_strokes: Optional[list] = None
 
 # Set up the model
+DATA_DIR = "processedFiles/"
+reader = StyleDataReader(DATA_DIR)
 style_model = StyleSynthesisModel(
+    reader=reader,
     log_dir="logs_style_synthesis",
     checkpoint_dir="checkpoints_style_synthesis",
     prediction_dir="predictions_style_synthesis",
@@ -498,12 +430,33 @@ def process_single_item(item, ref_strokes=None):
     # Build input tensors
     x_prime, x_prime_len, chars, chars_len, max_tsteps = build_input_tensors(item, text_len)
     
-    # Use provided reference style strokes if available
-    if ref_strokes is not None:
+    # Use provided reference style strokes if available and not empty
+    if ref_strokes is not None and len(ref_strokes) > 0:
         try:
-            ref_strokes = np.array(ref_strokes, dtype=np.float32)
-            x_prime = ref_strokes.reshape(1, -1, 3)
-            x_prime_len = np.array([len(ref_strokes)], dtype=np.int32)
+            # Convert the list of objects to a list of [x, y, eos] arrays
+            ref_strokes_array = np.array([[s['x'], s['y'], s['eos']] for s in ref_strokes], dtype=np.float32)
+            
+            # Normalize x and y coordinates to [-1, 1] range
+            x_coords = ref_strokes_array[:, 0]
+            y_coords = ref_strokes_array[:, 1]
+            
+            # Get min and max for x and y
+            x_min, x_max = x_coords.min(), x_coords.max()
+            y_min, y_max = y_coords.min(), y_coords.max()
+            
+            # Calculate scale factors (using max range to maintain aspect ratio)
+            x_range = x_max - x_min
+            y_range = y_max - y_min
+            max_range = max(x_range, y_range)
+            
+            if max_range > 0:
+                # Normalize to [-1, 1] range
+                ref_strokes_array[:, 0] = 2 * (x_coords - x_min) / max_range - 1
+                ref_strokes_array[:, 1] = 2 * (y_coords - y_min) / max_range - 1
+            
+            x_prime = ref_strokes_array.reshape(1, -1, 3)
+            x_prime_len = np.array([len(ref_strokes_array)], dtype=np.int32)
+            logging.info(f"Using normalized reference strokes with shape {x_prime.shape}")
         except Exception as e:
             logging.error(f"Error with reference strokes: {e}")
             # Continue with default style
@@ -538,6 +491,12 @@ def process_single_item(item, ref_strokes=None):
     logging.info(f"Processed line {item['index']}")
     return processed
 
+@app.get("/health")
+def health():
+    region = os.environ.get('CLOUD_RUN_REGION', 'unknown')
+    vm_name = os.environ.get('HOSTNAME', 'unknown')
+    return {"message": "OK", "region": region, "instance": os.environ.get('K_REVISION', 'unknown'), "vm": vm_name}
+
 @app.get("/hello")
 def hello():
     return {"message": "Hello, World!"}
@@ -569,18 +528,16 @@ def save_request_data(request: MarkdownRequest, output_dir: str = "saved_request
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
-    """Convert markdown to handwriting with lazy model initialization"""
-    global style_model, model_initialized
-    
-    # Ensure model is initialized
-    if not model_initialized:
-        if model_initialization_error:
-            raise HTTPException(status_code=500, detail=f"Model initialization failed: {model_initialization_error}")
-        try:
-            initialize_model()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to initialize model: {str(e)}")
-    
+    """
+    1. Parse the incoming Markdown into lines & metadata.
+    2. If ref_strokes provided:
+       a. Generate strokes using ref_strokes
+       b. Save to image and check quality
+       c. If quality check passes, return those strokes
+    3. If no ref_strokes or quality check fails:
+       a. Use default style_id to generate strokes
+    4. Return the final strokes
+    """
     # Save the incoming request data
     try:
         saved_file = save_request_data(request)
@@ -621,7 +578,7 @@ def convert_markdown(request: MarkdownRequest):
     max_workers = min(cpu_count * 2, 16)
     
     logging.info(f"Using {max_workers} worker threads with {cpu_count} CPU cores")
-    
+
     # Check if reference style strokes were provided
     ref_strokes = request.ref_strokes
     
@@ -675,7 +632,7 @@ def convert_markdown(request: MarkdownRequest):
     # Sort the results by index to maintain original order
     processed_lines.sort(key=lambda x: x["index"])
 
-    # 4) Merge per-line results into full-page output
+    # Merge per-line results into full-page output
     grouped = {}
     for entry in sorted(processed_lines, key=lambda x: x["index"]):
         gid = entry["metadata"]["group_id"]
@@ -713,9 +670,92 @@ def convert_markdown(request: MarkdownRequest):
             "stroke_color": group["stroke_color"]
         })
 
+    # If we have ref_strokes, check the quality of the generated handwriting
+    if ref_strokes:
+        try:
+            # Create a temporary file for the image
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                temp_path = temp_file.name
+            
+            # Save all strokes to the temporary image
+            all_strokes = [stroke for item in merged_output for stroke in item["strokes"]]
+            save_strokes_to_image(all_strokes, temp_path)
+            
+            # Check handwriting quality
+            quality_check = check_handwriting_quality(temp_path)
+            
+            # Clean up the temporary file
+            try:
+                os.unlink(temp_path)
+            except Exception as e:
+                logging.error(f"Error cleaning up temporary file: {e}")
+            
+            # If quality check passes, return the current strokes
+            if quality_check:
+                logging.info("Handwriting quality check passed with reference strokes")
+                return {"strokes": merged_output}
+            
+            # If quality check fails, regenerate with default style
+            logging.info("Handwriting quality check failed, regenerating with default style")
+            return convert_markdown(MarkdownRequest(
+                markdown=request.markdown,
+                style_id=request.style_id,
+                ref_strokes=None
+            ))
+            
+        except Exception as e:
+            logging.error(f"Error during handwriting quality check: {e}")
+            # If there's an error in quality check, fall back to default style
+            return convert_markdown(MarkdownRequest(
+                markdown=request.markdown,
+                style_id=request.style_id,
+                ref_strokes=None
+            ))
+    
+    # If no ref_strokes provided, return the current strokes
     return {"strokes": merged_output}
+
+def save_strokes_to_image(strokes, output_path):
+    """
+    Saves the strokes to an image file.
+    """
+    # Create figure with white background
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+    ax.set_facecolor('white')
+    fig.patch.set_facecolor('white')
+    
+    # Plot each stroke
+    for stroke in strokes:
+        if len(stroke) < 2:
+            continue
+        xs = [pt[0] for pt in stroke]
+        ys = [pt[1] for pt in stroke]
+        ax.plot(xs, ys, color='black', linewidth=1)
+    
+    # Remove axes and set equal aspect
+    ax.axis('off')
+    ax.set_aspect('equal')
+    
+    # Save the figure
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0.1, dpi=300)
+    plt.close(fig)
+
+def check_handwriting_quality(image_path):
+    """
+    Calls the handwriting quality check API.
+    """
+    try:
+        with open(image_path, 'rb') as f:
+            files = {'image': f}
+            response = requests.post(f"{GEMINI_SERVICE_URL}/check_handwriting", files=files)
+            response.raise_for_status()
+            result = response.json()
+            return result.get('ok', False) and result.get('result', False)
+    except Exception as e:
+        logging.error(f"Error checking handwriting quality: {e}")
+        return False
 
 if __name__ == '__main__':
     import uvicorn
-    port = int(os.environ.get('PORT', 8080))
-    uvicorn.run(app, host="0.0.0.0", port=port, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
