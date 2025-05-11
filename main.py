@@ -525,15 +525,35 @@ def save_request_data(request: MarkdownRequest, output_dir: str = "saved_request
 
 @app.post("/convert")
 def convert_markdown(request: MarkdownRequest):
-    """
-    1. Parse the incoming Markdown into lines & metadata.
-    2. If ref_strokes provided:
-       a. Generate strokes using ref_strokes
-       b. Save to image and check quality
-       c. If quality check passes, return those strokes
-    3. If no ref_strokes or quality check fails:
-       a. Use default style_id to generate strokes
-    4. Return the final strokes
+    """Convert markdown text to handwritten strokes.
+
+    This endpoint takes markdown text and converts it into a sequence of handwritten strokes.
+    It supports both default style-based generation and reference stroke-based generation.
+    The endpoint processes the markdown text line by line, maintaining formatting and structure.
+
+    Args:
+        request (MarkdownRequest): The request object containing:
+            - markdown (str): The markdown text to convert
+            - style_id (int, optional): The ID of the handwriting style to use. Defaults to 8.
+            - ref_strokes (list, optional): Reference strokes to guide the handwriting style.
+                If provided, these strokes will be used to influence the generated handwriting.
+
+    Returns:
+        dict: A dictionary containing:
+            - strokes (list): List of stroke groups, where each group contains:
+                - line (str): The original text line
+                - strokes (list): List of stroke sequences for the line
+                - stroke_width (int): Width of the strokes
+                - stroke_color (str): Color of the strokes
+
+    Raises:
+        HTTPException: If there's an error processing the style metadata or other processing errors.
+
+    Notes:
+        - The endpoint supports parallel processing of lines for better performance
+        - If reference strokes are provided, a quality check is performed
+        - If the quality check fails, it falls back to default style generation
+        - The endpoint maintains markdown formatting like headers, lists, and indentation
     """
     # Save the incoming request data
     try:
