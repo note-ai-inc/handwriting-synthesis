@@ -267,3 +267,7 @@ new run with parameters:
 [[05/11/2025 01:04:06 PM]] Processed line 34
 [[05/11/2025 01:04:06 PM]] Processed line 35
 [[05/11/2025 01:04:07 PM]] Processed line 36
+[[05/11/2025 01:21:40 PM]] Shutting down
+[[05/11/2025 01:21:40 PM]] Waiting for application shutdown.
+[[05/11/2025 01:21:40 PM]] Application shutdown complete.
+[[05/11/2025 01:21:40 PM]] Finished server process [8]

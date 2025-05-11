@@ -379,6 +379,6 @@ def api_compare_images():
 
 # --- Main ---
 if __name__ == "__main__":
-    logger.info(f"Starting Gemini service on port 5000 using model {MODEL_NAME}")
-    # For development, debug=True can be useful. For production, use a WSGI server.
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    logger.info(f"Starting Gemini service on port {port} using model {MODEL_NAME}")
+    app.run(host="0.0.0.0", port=port, debug=False)
