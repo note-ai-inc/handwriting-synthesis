@@ -30,7 +30,14 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --timeout 100 --retries 3 tensorflow==1.6.0 && \
     pip install --no-cache-dir --timeout 100 --retries 3 -r requirements.txt
 
-# Copy source code
+# Copy styles directory first
+COPY styles/ /app/styles/
+
+# Verify styles directory contents
+RUN ls -la /app/styles/ && \
+    python3 -c "import numpy as np; print('Testing style-3-strokes.npy...'); np.load('/app/styles/style-3-strokes.npy', allow_pickle=True)"
+
+# Copy remaining source code
 COPY . .
 
 # Expose port
