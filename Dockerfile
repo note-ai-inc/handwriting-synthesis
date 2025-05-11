@@ -30,10 +30,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --timeout 100 --retries 3 tensorflow==1.6.0 && \
     pip install --no-cache-dir --timeout 100 --retries 3 -r requirements.txt
 
-# Copy styles directory first
-COPY styles/ /app/styles/
-
-# Copy remaining source code
+# Copy source code
 COPY . .
 
 # Expose port
