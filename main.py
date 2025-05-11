@@ -67,9 +67,7 @@ class MarkdownRequest(BaseModel):
 
 # Set up the model
 DATA_DIR = "processedFiles/"
-reader = StyleDataReader(DATA_DIR)
 style_model = StyleSynthesisModel(
-    reader=reader,
     log_dir="logs_style_synthesis",
     checkpoint_dir="checkpoints_style_synthesis",
     prediction_dir="predictions_style_synthesis",
