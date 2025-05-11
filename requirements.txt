@@ -4,6 +4,8 @@
 # scipy>=1.0.0
 # svgwrite>=1.1.12
 
+# Note: For numpy pickle loading issues, ensure allow_pickle=True in your code
+# Example: np.load(file, allow_pickle=True)
 
 absl-py==1.4.0
 anyio==3.6.2
