@@ -352,8 +352,8 @@ def build_input_tensors(item, text_len):
     Build the input tensors for the model, following test_syn.py approach
     """
     style_id = item["style"]
-    style_strokes = np.load(f"styles/style-{style_id}-strokes.npy")
-    style_chars = np.load(f"styles/style-{style_id}-chars.npy").tobytes().decode('ascii')
+    style_strokes = np.load(f"styles/style-{style_id}-strokes.npy", allow_pickle=True)
+    style_chars = np.load(f"styles/style-{style_id}-chars.npy", allow_pickle=True).tobytes().decode('ascii')
     text = item["line"]
     
     full_char_seq = drawing.encode_ascii(style_chars + ' ' + text)
