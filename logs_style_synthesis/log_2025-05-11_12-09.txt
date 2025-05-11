@@ -1,4 +1,4 @@
-[[05/11/2025 12:08:26 PM]] 
+[[05/11/2025 12:09:30 PM]] 
 new run with parameters:
 {'attention_mixture_components': 10,
  'batch_size': 32,
@@ -31,8 +31,8 @@ new run with parameters:
  'style_embedding_size': 256,
  'validation_batch_size': 32,
  'warm_start_init_step': 0}
-[[05/11/2025 12:08:28 PM]] all parameters:
-[[05/11/2025 12:08:28 PM]] [('Variable:0', []),
+[[05/11/2025 12:09:32 PM]] all parameters:
+[[05/11/2025 12:09:32 PM]] [('Variable:0', []),
  ('Variable_1:0', []),
  ('Variable_2:0', []),
  ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
@@ -115,8 +115,8 @@ new run with parameters:
  ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
  ('rnn_style/gmm/biases/RMSProp:0', [121]),
  ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
-[[05/11/2025 12:08:28 PM]] trainable parameters:
-[[05/11/2025 12:08:28 PM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+[[05/11/2025 12:09:32 PM]] trainable parameters:
+[[05/11/2025 12:09:32 PM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
  ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
  ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
  ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
@@ -138,14 +138,72 @@ new run with parameters:
  ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
  ('rnn_style/gmm/weights:0', [400, 121]),
  ('rnn_style/gmm/biases:0', [121])]
-[[05/11/2025 12:08:28 PM]] trainable parameter count:
-[[05/11/2025 12:08:28 PM]] 5070128
-[[05/11/2025 12:08:28 PM]] built graph
-[[05/11/2025 12:08:28 PM]] Restoring parameters from final_checkpoints/model-10350
-[[05/11/2025 12:08:28 PM]] Started server process [6492]
-[[05/11/2025 12:08:28 PM]] Waiting for application startup.
-[[05/11/2025 12:08:28 PM]] Application startup complete.
-[[05/11/2025 12:08:51 PM]] Shutting down
-[[05/11/2025 12:08:52 PM]] Waiting for application shutdown.
-[[05/11/2025 12:08:52 PM]] Application shutdown complete.
-[[05/11/2025 12:08:52 PM]] Finished server process [6492]
+[[05/11/2025 12:09:32 PM]] trainable parameter count:
+[[05/11/2025 12:09:32 PM]] 5070128
+[[05/11/2025 12:09:32 PM]] built graph
+[[05/11/2025 12:09:32 PM]] Restoring parameters from final_checkpoints/model-10350
+[[05/11/2025 12:09:33 PM]] Started server process [8]
+[[05/11/2025 12:09:33 PM]] Waiting for application startup.
+[[05/11/2025 12:09:33 PM]] Application startup complete.
+[[05/11/2025 12:10:27 PM]] Saved request data to saved_requests/request_20250511_121027_fe9d0324.json
+[[05/11/2025 12:10:27 PM]] Using 16 worker threads with 32 CPU cores
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:27 PM]] Processed line 1
+[[05/11/2025 12:10:27 PM]] Using normalized reference strokes with shape (1, 1025, 3)
+[[05/11/2025 12:10:29 PM]] Processed line 2
+[[05/11/2025 12:10:29 PM]] Processed line 4
+[[05/11/2025 12:10:30 PM]] Processed line 6
+[[05/11/2025 12:10:31 PM]] Processed line 8
+[[05/11/2025 12:10:32 PM]] Processed line 0
+[[05/11/2025 12:10:33 PM]] Processed line 3
+[[05/11/2025 12:10:34 PM]] Processed line 5
+[[05/11/2025 12:10:34 PM]] Processed line 15
+[[05/11/2025 12:10:35 PM]] Processed line 7
+[[05/11/2025 12:10:35 PM]] Processed 10/17 items
+[[05/11/2025 12:10:36 PM]] Processed line 10
+[[05/11/2025 12:10:37 PM]] Processed line 11
+[[05/11/2025 12:10:37 PM]] Processed line 13
+[[05/11/2025 12:10:38 PM]] Processed line 12
+[[05/11/2025 12:10:39 PM]] Processed line 14
+[[05/11/2025 12:10:40 PM]] Processed line 9
+[[05/11/2025 12:10:40 PM]] Processed line 16
+[[05/11/2025 12:10:43 PM]] Handwriting quality check failed, regenerating with default style
+[[05/11/2025 12:10:43 PM]] Saved request data to saved_requests/request_20250511_121043_271e58ff.json
+[[05/11/2025 12:10:43 PM]] Using 16 worker threads with 32 CPU cores
+[[05/11/2025 12:10:44 PM]] Processed line 0
+[[05/11/2025 12:10:44 PM]] Processed line 1
+[[05/11/2025 12:10:45 PM]] Processed line 2
+[[05/11/2025 12:10:45 PM]] Processed line 3
+[[05/11/2025 12:10:46 PM]] Processed line 4
+[[05/11/2025 12:10:46 PM]] Processed line 5
+[[05/11/2025 12:10:47 PM]] Processed line 9
+[[05/11/2025 12:10:47 PM]] Processed line 6
+[[05/11/2025 12:10:48 PM]] Processed line 13
+[[05/11/2025 12:10:48 PM]] Processed line 7
+[[05/11/2025 12:10:48 PM]] Processed 10/17 items
+[[05/11/2025 12:10:49 PM]] Processed line 10
+[[05/11/2025 12:10:51 PM]] Processed line 8
+[[05/11/2025 12:10:51 PM]] Processed line 12
+[[05/11/2025 12:10:52 PM]] Processed line 14
+[[05/11/2025 12:10:52 PM]] Processed line 11
+[[05/11/2025 12:10:53 PM]] Processed line 15
+[[05/11/2025 12:10:53 PM]] Processed line 16
+[[05/11/2025 12:26:10 PM]] Shutting down
+[[05/11/2025 12:26:10 PM]] Waiting for application shutdown.
+[[05/11/2025 12:26:10 PM]] Application shutdown complete.
+[[05/11/2025 12:26:10 PM]] Finished server process [8]
