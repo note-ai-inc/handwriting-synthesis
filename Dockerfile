@@ -33,12 +33,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy styles directory first
 COPY styles/ /app/styles/
 
-# Verify styles directory contents
-RUN ls -la /app/styles/ && \
-    python3 -c "import numpy as np; print('Testing style-3-strokes.npy...'); np.load('/app/styles/style-3-strokes.npy', allow_pickle=True)"
-
-RUN ls -la /app/styles/
-
 # Copy remaining source code
 COPY . .
 
