@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - ./data:/app/data
       - ./styles:/app/styles
@@ -28,11 +28,11 @@ services:
     depends_on:
       - handwriting-quality
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     restart: unless-stopped
     deploy:
       resources:
@@ -67,7 +67,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     restart: unless-stopped
     deploy:
       resources:

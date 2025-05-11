@@ -66,7 +66,6 @@ class MarkdownRequest(BaseModel):
     ref_strokes: Optional[list] = None
 
 # Set up the model
-DATA_DIR = "processedFiles/"
 style_model = StyleSynthesisModel(
     log_dir="logs_style_synthesis",
     checkpoint_dir="checkpoints_style_synthesis",
