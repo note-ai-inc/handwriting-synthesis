@@ -24,4 +24,9 @@ echo "🌐 Service URLs:"
 echo "Handwriting Synthesis:"
 gcloud run services describe handwriting-synthesis --platform managed --region asia-northeast3 --format 'value(status.url)'
 echo "Handwriting Quality:"
-gcloud run services describe handwriting-quality --platform managed --region asia-northeast3 --format 'value(status.url)' 
+gcloud run services describe handwriting-quality --platform managed --region asia-northeast3 --format 'value(status.url)'
+
+# Show the status of the latest revision
+echo "📊 Checking service status..."
+sleep 10 # Give time for deployment to propagate
+gcloud run revisions list --platform managed --region asia-northeast3 --service handwriting-synthesis --limit 1 --format 'value(status.conditions)' 

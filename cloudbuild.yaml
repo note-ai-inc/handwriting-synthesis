@@ -41,7 +41,11 @@ steps:
       - '--set-env-vars'
       - 'GEMINI_SERVICE_URL=https://handwriting-quality-${PROJECT_ID}.a.run.app'
       - '--set-secrets'
-      - ' GOOGLE_API_KEY=GOOGLE_API_KEY:latest'
+      - 'GOOGLE_API_KEY=GOOGLE_API_KEY:latest'
+      - '--command'
+      - 'uvicorn'
+      - '--args'
+      - 'main:app,--host=0.0.0.0,--port=8080,--workers=1,--log-level=info'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
