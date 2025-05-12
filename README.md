@@ -158,3 +158,14 @@ Both services implement detailed logging:
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
+
+
+# Deploying the services
+```bash
+gcloud run deploy handwriting-synthesis --source . --platform managed --region us-central1 --allow-unauthenticated --memory 8Gi --cpu 8 --timeout 600 --min-instances 1 --max-instances 10 --port 8080
+```
+
+# Monitoring the services
+```bash
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=handwriting-synthesis" --limit 1000 --format="table(timestamp,textPayload)" | cat
+```

@@ -30,11 +30,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --timeout 100 --retries 3 tensorflow==1.6.0 && \
     pip install --no-cache-dir --timeout 100 --retries 3 -r requirements.txt
 
-# Copy source code
+# Copy source code and required directories
 COPY . .
+COPY styles /app/styles/
+COPY final_checkpoints /app/final_checkpoints/
 
 # Expose port
 EXPOSE 8080
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1", "--log-level", "info"]

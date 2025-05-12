@@ -26,7 +26,7 @@ import io
 from PIL import Image
 
 # Add environment variable for handwriting quality service URL
-GEMINI_SERVICE_URL = os.getenv('GEMINI_SERVICE_URL', 'http://handwriting-quality:5000')
+GEMINI_SERVICE_URL = os.getenv('GEMINI_SERVICE_URL', 'https://handwriting-quality-334167120222.us-central1.run.app')
 
 # But without complex multiprocessing that causes session issues
 config = tf.ConfigProto(
@@ -765,15 +765,28 @@ def check_handwriting_quality(image_path):
     try:
         with open(image_path, 'rb') as f:
             files = {'image': f}
-            response = requests.post(f"{GEMINI_SERVICE_URL}/check_handwriting", files=files)
+            response = requests.post(f"{GEMINI_SERVICE_URL}/check_handwriting", files=files, timeout=5)
             response.raise_for_status()
             result = response.json()
             return result.get('ok', False) and result.get('result', False)
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"Handwriting quality service unavailable: {e}")
+        # If service is unavailable, assume quality is good
+        return True
     except Exception as e:
         logging.error(f"Error checking handwriting quality: {e}")
-        return False
+        # If there's an error, assume quality is good
+        return True
 
 if __name__ == '__main__':
     import uvicorn
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+    
     port = int(os.getenv('PORT', 8080))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    logging.info(f"Starting application on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

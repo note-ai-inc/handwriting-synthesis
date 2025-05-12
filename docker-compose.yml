@@ -19,7 +19,7 @@ services:
       - CLOUD_RUN_REGION=${CLOUD_RUN_REGION:-unknown}
       - HOSTNAME=${HOSTNAME:-unknown}
       - K_REVISION=${K_REVISION:-unknown}
-      - GEMINI_SERVICE_URL=http://handwriting-quality:5000
+      - GEMINI_SERVICE_URL=https://handwriting-quality-334167120222.us-central1.run.app
       - UVICORN_RELOAD=true
       - UVICORN_RELOAD_DIRS=/app
     networks:

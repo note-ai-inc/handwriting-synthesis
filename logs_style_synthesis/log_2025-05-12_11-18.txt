@@ -1,4 +1,4 @@
-[[05/12/2025 06:14:00 AM]] 
+[[05/12/2025 11:18:54 AM]] 
 new run with parameters:
 {'attention_mixture_components': 10,
  'batch_size': 32,
@@ -31,8 +31,8 @@ new run with parameters:
  'style_embedding_size': 256,
  'validation_batch_size': 32,
  'warm_start_init_step': 0}
-[[05/12/2025 06:14:02 AM]] all parameters:
-[[05/12/2025 06:14:02 AM]] [('Variable:0', []),
+[[05/12/2025 11:18:56 AM]] all parameters:
+[[05/12/2025 11:18:56 AM]] [('Variable:0', []),
  ('Variable_1:0', []),
  ('Variable_2:0', []),
  ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
@@ -115,8 +115,8 @@ new run with parameters:
  ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
  ('rnn_style/gmm/biases/RMSProp:0', [121]),
  ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
-[[05/12/2025 06:14:02 AM]] trainable parameters:
-[[05/12/2025 06:14:02 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+[[05/12/2025 11:18:56 AM]] trainable parameters:
+[[05/12/2025 11:18:56 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
  ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
  ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
  ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
@@ -138,14 +138,14 @@ new run with parameters:
  ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
  ('rnn_style/gmm/weights:0', [400, 121]),
  ('rnn_style/gmm/biases:0', [121])]
-[[05/12/2025 06:14:02 AM]] trainable parameter count:
-[[05/12/2025 06:14:02 AM]] 5070128
-[[05/12/2025 06:14:02 AM]] built graph
-[[05/12/2025 06:14:02 AM]] Restoring parameters from final_checkpoints/model-10350
-[[05/12/2025 06:14:02 AM]] Started server process [8]
-[[05/12/2025 06:14:02 AM]] Waiting for application startup.
-[[05/12/2025 06:14:02 AM]] Application startup complete.
-[[05/12/2025 10:45:43 AM]] Shutting down
-[[05/12/2025 10:45:43 AM]] Waiting for application shutdown.
-[[05/12/2025 10:45:43 AM]] Application shutdown complete.
-[[05/12/2025 10:45:43 AM]] Finished server process [8]
+[[05/12/2025 11:18:56 AM]] trainable parameter count:
+[[05/12/2025 11:18:56 AM]] 5070128
+[[05/12/2025 11:18:56 AM]] built graph
+[[05/12/2025 11:18:56 AM]] Restoring parameters from final_checkpoints/model-10350
+[[05/12/2025 11:18:56 AM]] Started server process [4319]
+[[05/12/2025 11:18:56 AM]] Waiting for application startup.
+[[05/12/2025 11:18:56 AM]] Application startup complete.
+[[05/12/2025 11:19:15 AM]] Shutting down
+[[05/12/2025 11:19:15 AM]] Waiting for application shutdown.
+[[05/12/2025 11:19:15 AM]] Application shutdown complete.
+[[05/12/2025 11:19:15 AM]] Finished server process [4319]
