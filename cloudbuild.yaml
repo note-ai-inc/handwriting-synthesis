@@ -70,6 +70,10 @@ steps:
       - '5'
       - '--set-secrets'
       - 'GOOGLE_API_KEY=GOOGLE_API_KEY:latest'
+      - '--command'
+      - 'uvicorn'
+      - '--args'
+      - 'gemini_image_compare:app,--host=0.0.0.0,--port=5000,--workers=1,--log-level=info'
 
 images:
   - 'gcr.io/$PROJECT_ID/handwriting-synthesis:$COMMIT_SHA'

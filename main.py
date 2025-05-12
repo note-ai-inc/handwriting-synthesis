@@ -26,7 +26,7 @@ import io
 from PIL import Image
 
 # Add environment variable for handwriting quality service URL
-GEMINI_SERVICE_URL = os.getenv('GEMINI_SERVICE_URL', 'https://handwriting-quality-334167120222.us-central1.run.app')
+GEMINI_SERVICE_URL = os.getenv('GEMINI_SERVICE_URL', 'http://handwriting-quality:5000')
 
 # But without complex multiprocessing that causes session issues
 config = tf.ConfigProto(
