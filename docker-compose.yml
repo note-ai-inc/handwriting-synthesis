@@ -50,7 +50,7 @@ services:
     expose:
       - "5000"
     environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_API_KEY=AIzaSyDivuZiJD_A2ba9l5nuZHT8gqyeSY2jmkY
     volumes:
       - ./temp:/tmp
     networks:
