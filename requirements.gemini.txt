@@ -3,3 +3,5 @@ python-dotenv
 Werkzeug
 Pillow
 google-genai
+fastapi
+uvicorn[standard]
