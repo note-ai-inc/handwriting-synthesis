@@ -64,6 +64,8 @@ class MarkdownRequest(BaseModel):
     markdown: str
     style_id: Optional[int] = 8  # Default style id if not provided
     ref_strokes: Optional[list] = None
+    screen_width: Optional[int] = 800  # Default screen width
+    screen_height: Optional[int] = 600  # Default screen height
 
 # Set up the model
 style_model = StyleSynthesisModel(
@@ -261,10 +263,10 @@ def optimize_strokes(strokes, precision=4):
         processed_strokes.append(processed_stroke)
     return processed_strokes
 
-def process_stroke(item, stroke, initial_coord):
+def process_stroke(item, stroke, initial_coord, screen_width=800, screen_height=600):
     """
     Converts a single sub-segment (line item) into coordinate strokes
-    at a given 'initial_coord'.
+    at a given 'initial_coord', scaled for the given screen dimensions.
     """
     line = item["line"]
     meta = item["metadata"]
@@ -281,8 +283,13 @@ def process_stroke(item, stroke, initial_coord):
             "metadata": meta,
         }
 
-    # Scale up slightly
-    stroke[:, :2] *= 1.5
+    # Calculate responsive scaling factor based on screen width
+    # Base scaling assumes 800px width, adjust proportionally
+    base_width = 800
+    scale_factor = (screen_width / base_width) * 1.5
+    
+    # Scale up based on screen size
+    stroke[:, :2] *= scale_factor
 
     # Convert offsets -> absolute coords
     coords = drawing.offsets_to_coords(stroke)
@@ -293,8 +300,10 @@ def process_stroke(item, stroke, initial_coord):
     # Place chunk around initial_coord
     coords[:, :2] = coords[:, :2] - coords[:, :2].min() + initial_coord
 
+    # Responsive indentation based on screen width
     indent = meta.get("indent", 0)
-    coords[:, 0] += indent * 50 + 20
+    indent_size = max(20, screen_width * 0.025)  # 2.5% of screen width, minimum 20px
+    coords[:, 0] += indent * indent_size + 20
 
     stroke_coords = coords.tolist()
     stroke_segments = split_stroke_by_eos(stroke_coords)
@@ -309,11 +318,15 @@ def process_stroke(item, stroke, initial_coord):
         "metadata": meta
     }
 
-def combine_segments_as_one_line(list_of_segments, spacing=20):
+def combine_segments_as_one_line(list_of_segments, screen_width=800, spacing=None):
     """
     Takes a list of sub-segment stroke data and places each 
-    sub-segment horizontally after the previous one.
+    sub-segment horizontally after the previous one with responsive spacing.
     """
+    # Calculate responsive spacing based on screen width
+    if spacing is None:
+        spacing = max(10, screen_width * 0.025)  # 2.5% of screen width, minimum 10px
+    
     x_offset = 0.0
     combined_strokes = []
 
@@ -417,7 +430,7 @@ def render_strokes_to_image(strokes, out_path, dpi=150):
     plt.close(fig)
 
 # Process a single item with proper thread safety
-def process_single_item(item, ref_strokes=None):
+def process_single_item(item, ref_strokes=None, screen_width=800, screen_height=600):
     """
     Process a single line item into handwriting strokes.
     Thread-safe implementation using the global session.
@@ -480,10 +493,10 @@ def process_single_item(item, ref_strokes=None):
     # Strip padding rows (any all-zero rows)
     seq = sampled[0][~np.all(sampled[0] == 0.0, axis=1)]
     
-    # Process the stroke sequence
+    # Process the stroke sequence with responsive dimensions
     base_initial_coord = np.array([0, -30])
     initial_coord = base_initial_coord.copy()
-    processed = process_stroke(item, seq, initial_coord)
+    processed = process_stroke(item, seq, initial_coord, screen_width, screen_height)
     
     logging.info(f"Processed line {item['index']}")
     return processed
@@ -515,6 +528,8 @@ def save_request_data(request: MarkdownRequest, output_dir: str = "saved_request
         "markdown": request.markdown,
         "style_id": request.style_id,
         "ref_strokes": request.ref_strokes,
+        "screen_width": request.screen_width,
+        "screen_height": request.screen_height,
         "timestamp": timestamp
     }
     
@@ -537,6 +552,8 @@ def convert_markdown(request: MarkdownRequest):
             - style_id (int, optional): The ID of the handwriting style to use. Defaults to 8.
             - ref_strokes (list, optional): Reference strokes to guide the handwriting style.
                 If provided, these strokes will be used to influence the generated handwriting.
+            - screen_width (int, optional): The width of the screen. Defaults to 800.
+            - screen_height (int, optional): The height of the screen. Defaults to 600.
 
     Returns:
         dict: A dictionary containing:
@@ -598,12 +615,18 @@ def convert_markdown(request: MarkdownRequest):
 
     # Check if reference style strokes were provided
     ref_strokes = request.ref_strokes
+    screen_width = request.screen_width
+    screen_height = request.screen_height
+    
+    # Calculate responsive line spacing based on screen height
+    base_height = 600
+    line_spacing = max(30, (screen_height / base_height) * 50)
     
     # Process items in parallel using thread pool
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # Submit all items to the executor
-            future_to_item = {executor.submit(process_single_item, item, ref_strokes): item 
+            # Submit all items to the executor with screen dimensions
+            future_to_item = {executor.submit(process_single_item, item, ref_strokes, screen_width, screen_height): item 
                             for item in indexed_items}
             
             # Collect results as they complete
@@ -633,7 +656,7 @@ def convert_markdown(request: MarkdownRequest):
         processed_lines = []
         for item in indexed_items:
             try:
-                processed = process_single_item(item, ref_strokes)
+                processed = process_single_item(item, ref_strokes, screen_width, screen_height)
                 processed_lines.append(processed)
             except Exception as item_e:
                 logging.error(f"Sequential processing failed for item {item['index']}: {item_e}")
@@ -666,19 +689,20 @@ def convert_markdown(request: MarkdownRequest):
     for gid in sorted(grouped):
         group = grouped[gid]
         text = " ".join(filter(None, group["lines"]))
-        combined = combine_segments_as_one_line(group["segments"], spacing=20)
+        combined = combine_segments_as_one_line(group["segments"], screen_width)
 
-        # Vertical offset by line number
+        # Responsive vertical offset by line number
         for stroke in combined:
             for pt in stroke:
-                pt[1] += gid * 50
+                pt[1] += gid * line_spacing
 
-        # Indent if needed
+        # Responsive indentation if needed
         indent = group["metadata"].get("indent", 0)
         if indent:
+            indent_size = max(20, screen_width * 0.025)  # 2.5% of screen width, minimum 20px
             for stroke in combined:
                 for pt in stroke:
-                    pt[0] += indent * 50 + 20
+                    pt[0] += indent * indent_size + 20
 
         merged_output.append({
             "line": text,
@@ -717,7 +741,9 @@ def convert_markdown(request: MarkdownRequest):
             return convert_markdown(MarkdownRequest(
                 markdown=request.markdown,
                 style_id=request.style_id,
-                ref_strokes=None
+                ref_strokes=None,
+                screen_width=request.screen_width,
+                screen_height=request.screen_height
             ))
             
         except Exception as e:
@@ -726,7 +752,9 @@ def convert_markdown(request: MarkdownRequest):
             return convert_markdown(MarkdownRequest(
                 markdown=request.markdown,
                 style_id=request.style_id,
-                ref_strokes=None
+                ref_strokes=None,
+                screen_width=request.screen_width,
+                screen_height=request.screen_height
             ))
     
     # If no ref_strokes provided, return the current strokes
