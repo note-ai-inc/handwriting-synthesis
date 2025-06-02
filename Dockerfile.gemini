@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.gemini.txt .
-RUN pip install --no-cache-dir -r requirements.gemini.txt
+RUN pip install -r requirements.gemini.txt
 
 # Copy the application code
 COPY gemini_image_compare.py .

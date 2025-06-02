@@ -1,6 +1,0 @@
-{
-  "markdown": "Notes: - The endpoint supports parallel processing of lines for better performance - If reference strokes are provided, a quality check is performed - If the quality check fails, it falls back to default style generation - The endpoint maintains markdown formatting like headers, lists, and indentation ",
-  "style_id": 8,
-  "ref_strokes": null,
-  "timestamp": "20250512_140540"
-}
