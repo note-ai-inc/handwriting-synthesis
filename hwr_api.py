@@ -81,7 +81,7 @@ style_model = StyleSynthesisModel(
     enable_parameter_averaging=False,
     min_steps_to_checkpoint=2000,
     log_interval=50,
-    grad_clip=10,
+    grad_clip=50,
     lstm_size=400,
     output_mixture_components=20,
     attention_mixture_components=10,
@@ -89,7 +89,7 @@ style_model = StyleSynthesisModel(
 )
 
 # Restore from latest or specific checkpoint
-checkpoint_path = "checkpoints/model-10350"
+checkpoint_path = "checkpoints/model-10900"
 style_model.saver.restore(style_model.session, checkpoint_path)
 
 # Set deterministic sampling

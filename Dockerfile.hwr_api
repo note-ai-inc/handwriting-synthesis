@@ -1,41 +1,84 @@
-# Use Python 3.6 as base image (compatible with TensorFlow 1.6.0)
-FROM python:3.6-slim
+# Use CUDA 10.0 base with Ubuntu 18.04 for GPU support
+FROM noelmni/cuda:10.0-cudnn7-devel-ubuntu18.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Set working directory
 WORKDIR /app
 
-# Set environment variables
+# Set environment variables for Python, CUDA, and Locale (SIMPLE FIX)
 ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_DEFAULT_TIMEOUT=100 \
-    PIP_RETRIES=3
+    PIP_RETRIES=3 \
+    CUDA_HOME=/usr/local/cuda-10.0 \
+    LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64 \
+    PATH=/usr/local/cuda-10.0/bin:${PATH} \
+    PYTHONIOENCODING=utf-8 \
+    LC_ALL=C.UTF-8 \
+    LANG=C.UTF-8
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install Python 3.6 and system dependencies (without locale generation)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3.6 \
+    python3.6-dev \
+    python3-pip \
+    python3-setuptools \
     build-essential \
     curl \
     git \
-    libhdf5-dev \
-    libssl-dev \
     wget \
     unzip \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    libfreetype6-dev \
+    libpng-dev \
+    libzmq3-dev \
+    pkg-config \
+    libhdf5-dev \
+    libssl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* /var/tmp/*
+
+# Create symlinks for python and pip
+RUN ln -sf /usr/bin/python3.6 /usr/bin/python && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Upgrade pip
+RUN pip install --upgrade pip
 
 # Copy requirements file
 COPY requirements.hwr_api.txt .
 
-# Install Python dependencies with increased timeout and retries
-RUN pip install --no-cache-dir --timeout 100 --retries 3 tensorflow==1.6.0 && \
-    pip install --no-cache-dir --timeout 100 --retries 3 -r requirements.hwr_api.txt
+# Install TensorFlow GPU and other dependencies
+RUN pip install --no-cache-dir --timeout 100 --retries 3 \
+    tensorflow-gpu==1.15.0 \
+    -r requirements.hwr_api.txt \
+    && pip cache purge
 
-# Copy source code and required directories
-COPY . .
-COPY styles /app/styles/
-COPY checkpoints /app/checkpoints/
+# Create non-root user for security (API mode)
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Expose port
+# Copy application code and required directories
+COPY --chown=appuser:appuser . .
+
+# Ensure required directories exist with correct permissions
+RUN mkdir -p /app/styles /app/checkpoints /app/models \
+    && chown -R appuser:appuser /app
+
+# Switch to non-root user for API serving
+USER appuser
+
+# Expose port for API
 EXPOSE 8080
 
-# Command to run the application
+# Health check for API mode
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command - can be overridden for training vs inference
+# For API inference (default)
 CMD ["uvicorn", "hwr_api:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1", "--log-level", "info"]

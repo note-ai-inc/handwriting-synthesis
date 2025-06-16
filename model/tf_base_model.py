@@ -5,12 +5,14 @@ import logging
 import os
 import pprint as pp
 import time
+import shutil  # Added for checkpoint copying
 
 import numpy as np
 import tensorflow as tf
 
 from model.tf_utils import shape
-
+np.random.seed(42)  # Set Numpy seed for reproducibility
+tf.set_random_seed(42)  # Set TensorFlow seed for reproducibility
 
 class TFBaseModel(object):
 
@@ -47,6 +49,9 @@ class TFBaseModel(object):
         log_dir: Directory where logs are written.
         checkpoint_dir: Directory where checkpoints are saved.
         prediction_dir: Directory where predictions/outputs are saved.
+        max_to_keep: Maximum number of recent checkpoints to keep.
+        keep_checkpoint_every_n_hours: Keep checkpoints every n hours, regardless of max_to_keep.
+        save_all_checkpoints: If True, all checkpoints will be backed up and never deleted.
     """
 
     def __init__(
@@ -71,11 +76,12 @@ class TFBaseModel(object):
         log_dir='logs',
         checkpoint_dir='checkpoints',
         prediction_dir='predictions',
+        max_to_keep=5,  # Now keep 5 checkpoints by default
+        keep_checkpoint_every_n_hours=10000,  # Keep checkpoints every n hours
+        save_all_checkpoints=False  # Option to save all checkpoints
     ):
-        # Only validate batch sizes if we have a reader (training mode)
-        if reader is not None:
-            assert len(batch_sizes) == len(learning_rates) == len(patiences)
-        
+
+        assert len(batch_sizes) == len(learning_rates) == len(patiences)
         self.batch_sizes = batch_sizes
         self.learning_rates = learning_rates
         self.beta1_decays = beta1_decays
@@ -101,6 +107,15 @@ class TFBaseModel(object):
         self.logging_level = logging_level
         self.prediction_dir = prediction_dir
         self.checkpoint_dir = checkpoint_dir
+        
+        # Backup directory for all checkpoints if save_all_checkpoints is True
+        self.all_checkpoints_dir = os.path.join(checkpoint_dir, 'all_checkpoints')
+        
+        # New parameters for checkpoint management
+        self.max_to_keep = max_to_keep
+        self.keep_checkpoint_every_n_hours = keep_checkpoint_every_n_hours
+        self.save_all_checkpoints = save_all_checkpoints
+        
         if self.enable_parameter_averaging:
             self.checkpoint_dir_averaged = checkpoint_dir + '_avg'
 
@@ -130,6 +145,7 @@ class TFBaseModel(object):
                 self.session.run(self.init)
                 step = 0
 
+            
             train_generator = self.reader.train_batch_generator(self.batch_size)
             val_generator = self.reader.val_batch_generator(self.validation_batch_size)
 
@@ -162,7 +178,7 @@ class TFBaseModel(object):
                     val_feed_dict.update({self.is_training: False})
 
                 results = self.session.run(
-                    fetches=[self.loss] + self.metrics.values(),
+                    fetches=[self.loss] + list(self.metrics.values()),
                     feed_dict=val_feed_dict
                 )
                 val_loss = results[0]
@@ -313,25 +329,54 @@ class TFBaseModel(object):
         checkpoint_dir = self.checkpoint_dir_averaged if averaged else self.checkpoint_dir
         if not os.path.isdir(checkpoint_dir):
             logging.info('creating checkpoint directory {}'.format(checkpoint_dir))
-            os.mkdir(checkpoint_dir)
+            os.makedirs(checkpoint_dir)
 
         model_path = os.path.join(checkpoint_dir, 'model')
         logging.info('saving model to {}'.format(model_path))
-        saver.save(self.session, model_path, global_step=step)
+        save_path = saver.save(self.session, model_path, global_step=step)
+        
+        # If save_all_checkpoints is enabled, make a permanent backup copy
+        if self.save_all_checkpoints:
+            # Create backup directory if it doesn't exist
+            if not os.path.isdir(self.all_checkpoints_dir):
+                os.makedirs(self.all_checkpoints_dir)
+            
+            # Get the filenames of the checkpoint files
+            basename = os.path.basename(save_path)
+            directory = os.path.dirname(save_path)
+            
+            # Copy all files related to this checkpoint (metadata, index, data)
+            for filename in os.listdir(directory):
+                if basename in filename:
+                    src_path = os.path.join(directory, filename)
+                    dst_path = os.path.join(self.all_checkpoints_dir, filename)
+                    shutil.copy2(src_path, dst_path)
+            
+            logging.info('backed up checkpoint from step {} to {}'.format(step, self.all_checkpoints_dir))
 
     def restore(self, step=None, averaged=False):
         saver = self.saver_averaged if averaged else self.saver
         checkpoint_dir = self.checkpoint_dir_averaged if averaged else self.checkpoint_dir
+        
+        # First check if we can find the checkpoint in the regular directory
         if not step:
             model_path = tf.train.latest_checkpoint(checkpoint_dir)
-            logging.info('restoring model parameters from {}'.format(model_path))
-            saver.restore(self.session, model_path)
         else:
             model_path = os.path.join(
                 checkpoint_dir, 'model{}-{}'.format('_avg' if averaged else '', step)
             )
-            logging.info('restoring model from {}'.format(model_path))
-            saver.restore(self.session, model_path)
+            
+        # If not found and save_all_checkpoints is enabled, try the backup directory
+        if not os.path.exists(model_path + ".index") and self.save_all_checkpoints and step:
+            backup_path = os.path.join(
+                self.all_checkpoints_dir, 'model{}-{}'.format('_avg' if averaged else '', step)
+            )
+            if os.path.exists(backup_path + ".index"):
+                model_path = backup_path
+                logging.info('found backup checkpoint in {}'.format(self.all_checkpoints_dir))
+                
+        logging.info('restoring model from {}'.format(model_path))
+        saver.restore(self.session, model_path)
 
     def init_logging(self, log_dir):
         if not os.path.isdir(log_dir):
@@ -401,9 +446,16 @@ class TFBaseModel(object):
             self.loss = self.calculate_loss()
             self.update_parameters(self.loss)
 
-            self.saver = tf.train.Saver(max_to_keep=1)
+            # Modified to keep multiple checkpoints
+            self.saver = tf.train.Saver(max_to_keep=self.max_to_keep, 
+                                        keep_checkpoint_every_n_hours=self.keep_checkpoint_every_n_hours)
+            
             if self.enable_parameter_averaging:
-                self.saver_averaged = tf.train.Saver(self.ema.variables_to_restore(), max_to_keep=1)
+                self.saver_averaged = tf.train.Saver(
+                    self.ema.variables_to_restore(), 
+                    max_to_keep=self.max_to_keep,
+                    keep_checkpoint_every_n_hours=self.keep_checkpoint_every_n_hours
+                )
 
             self.init = tf.global_variables_initializer()
             return graph
