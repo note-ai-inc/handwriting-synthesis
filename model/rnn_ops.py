@@ -6,12 +6,19 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import tensor_array_ops
 from tensorflow.python.ops import variable_scope as vs
-from tensorflow.python.ops.rnn_cell_impl import _concat, _like_rnncell
+from tensorflow.python.ops.rnn_cell_impl import _concat
 from tensorflow.python.ops.rnn import _maybe_tensor_shape_from_tensor
 from tensorflow.python.util import nest
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.eager import context
+import tensorflow as tf
 
+# Fix for TensorFlow 1.15 compatibility
+def _like_rnncell(cell):
+    """Check if cell looks like an RNN cell."""
+    return hasattr(cell, "output_size") and hasattr(cell, "state_size")
+
+tf.set_random_seed(42)   # Set TensorFlow seed for reproducibility
 
 def raw_rnn(cell, loop_fn, parallel_iterations=None, swap_memory=False, scope=None):
     """
@@ -37,7 +44,7 @@ def raw_rnn(cell, loop_fn, parallel_iterations=None, swap_memory=False, scope=No
     # determined by the parent scope, or is set to place the cached
     # Variable using the same placement as for the rest of the RNN.
     with vs.variable_scope(scope or "rnn") as varscope:
-        if context.in_graph_mode():
+        if not context.executing_eagerly():
             if varscope.caching_device is None:
                 varscope.set_caching_device(lambda op: op.device)
 
@@ -208,7 +215,7 @@ def rnn_teacher_force(inputs, cell, sequence_length, initial_state, scope='dynam
     return states, outputs, final_state
 
 
-def rnn_free_run(cell, initial_state, sequence_length, initial_input=None, scope='dynamic-rnn-free-run'):
+def rnn_free_run(cell, initial_state, sequence_length, initial_input=None, style_context=None, scope='dynamic-rnn-free-run'):
     """
     Implementation of an rnn which feeds its feeds its predictions back to itself at the next timestep.
 
@@ -233,10 +240,24 @@ def rnn_free_run(cell, initial_state, sequence_length, initial_input=None, scope
         )
         finished = math_ops.reduce_all(elements_finished)
 
+        if style_context is not None:
+            # Get the style for the current timestep
+            current_style = array_ops.slice(style_context, [0, time, 0], [-1, 1, -1])
+            current_style = array_ops.squeeze(current_style, axis=1)
+        
+        def get_next_input():
+            if cell_output is None:
+                return initial_input
+            else:
+                base_input = cell.output_function(next_cell_state)
+                if style_context is not None:
+                    return tf.concat([base_input, current_style], axis=-1)
+                return base_input
+
         next_input = control_flow_ops.cond(
             finished,
             lambda: array_ops.zeros_like(initial_input),
-            lambda: initial_input if cell_output is None else cell.output_function(next_cell_state)
+            get_next_input
         )
         emit_output = next_input[0] if cell_output is None else next_input
 

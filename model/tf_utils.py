@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+tf.set_random_seed(42)   # Set TensorFlow seed for reproducibility
 
 def dense_layer(inputs, output_units, bias=True, activation=None, batch_norm=None,
                 dropout=None, scope='dense-layer', reuse=False):

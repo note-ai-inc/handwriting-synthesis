@@ -13,6 +13,8 @@ from model.tf_utils import time_distributed_dense_layer, shape
 np.random.seed(42)  # Set Numpy seed for reproducibility
 tf.set_random_seed(42) # Set TensorFlow seed for reproducibility
 
+
+
 class StyleEncoder(tf.keras.layers.Layer):
     def __init__(self, hidden_size=128, output_size=256):
         super(StyleEncoder, self).__init__()
@@ -46,14 +48,7 @@ class StyleSynthesisModel(TFBaseModel):
         self.attention_mixture_components = attention_mixture_components
         self.style_embedding_size = style_embedding_size
         self.output_units = self.output_mixture_components * 6 + 1
-        
-        # Only pass reader to parent if it's provided
-        if 'reader' in kwargs:
-            super(StyleSynthesisModel, self).__init__(**kwargs)
-        else:
-            # Remove reader from kwargs for inference
-            kwargs.pop('reader', None)
-            super(StyleSynthesisModel, self).__init__(reader=None, **kwargs)
+        super(StyleSynthesisModel, self).__init__(**kwargs)
 
     def calculate_loss(self):
         self.x = tf.placeholder(tf.float32, [None, None, 3], name="x")
@@ -197,7 +192,7 @@ class StyleDataReader(object):
         data_cols = ["x", "x_len", "c", "c_len"]
         arrays = []
         for dc in data_cols:
-            arr = np.load(os.path.join(data_dir, f"{dc}.npy"), allow_pickle=True)
+            arr = np.load(os.path.join(data_dir, f"{dc}.npy"))
             arrays.append(arr)
         self.df = DataFrame(columns=data_cols, data=arrays)
         self.train_df, self.val_df = self.df.train_test_split(train_size=0.95, random_state=42)
@@ -216,12 +211,14 @@ class StyleDataReader(object):
             shuffle=shuffle,
             num_epochs=10000
         )
+
         for batch in gen:
             # slice x->y for teacher forcing
+            
             batch["x_len"] = batch["x_len"] - 1
             max_x_len = np.max(batch["x_len"])
             max_c_len = np.max(batch["c_len"])
-
+            # print("**************** GEN ******************** ", max_x_len)
             # slice for teacher forcing
             batch["y"] = batch["x"][:, 1 : max_x_len + 1, :]
             batch["x"] = batch["x"][:, :max_x_len, :]
@@ -229,8 +226,12 @@ class StyleDataReader(object):
 
             # create some ref_x
             # e.g. simply use the first 20 frames (or random slice) as "reference"
+            
+            
             ref_len = np.minimum(50, max_x_len)
+            
             batch["ref_x"] = batch["x"][:, :ref_len, :]
+            # print("********************* REF ***************  ", batch["ref_x"].shape)
             batch["ref_x_len"] = np.full(batch["x"].shape[0], ref_len, dtype=np.int32)
 
             yield batch
