@@ -1,0 +1,442 @@
+[[06/17/2025 11:06:01 AM]] 
+new run with parameters:
+{'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 10,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': None,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[06/17/2025 11:06:07 AM]] all parameters:
+[[06/17/2025 11:06:07 AM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[06/17/2025 11:06:07 AM]] trainable parameters:
+[[06/17/2025 11:06:07 AM]] [('style_encoder/bidirectional/lstm_cell/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell/bias:0', [512]),
+ ('style_encoder/bidirectional/lstm_cell_1/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/lstm_cell_1/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[06/17/2025 11:06:07 AM]] trainable parameter count:
+[[06/17/2025 11:06:07 AM]] 5070128
+[[06/17/2025 11:06:08 AM]] built graph
+[[06/17/2025 11:06:08 AM]] Restoring parameters from checkpoints/model-10350
+[[06/17/2025 11:06:08 AM]] Started server process [6550]
+[[06/17/2025 11:06:08 AM]] Waiting for application startup.
+[[06/17/2025 11:06:08 AM]] Application startup complete.
+[[06/17/2025 11:06:08 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Hassan (Organizer)\n- Homayoo\n- Noumo\n- Andrew\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:06:08 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:06:09 AM]] Processed line 0
+[[06/17/2025 11:06:12 AM]] Processed line 3
+[[06/17/2025 11:06:12 AM]] Processed line 2
+[[06/17/2025 11:06:16 AM]] Processed line 1
+[[06/17/2025 11:06:20 AM]] Processed line 4
+[[06/17/2025 11:06:24 AM]] Processed line 5
+[[06/17/2025 11:06:26 AM]] Processed line 7
+[[06/17/2025 11:06:27 AM]] Processed line 6
+[[06/17/2025 11:06:30 AM]] Processed line 8
+[[06/17/2025 11:06:31 AM]] Processed line 11
+[[06/17/2025 11:06:31 AM]] Processed 10/41 items
+[[06/17/2025 11:06:32 AM]] Processed line 10
+[[06/17/2025 11:06:34 AM]] Processed line 9
+[[06/17/2025 11:06:35 AM]] Processed line 12
+[[06/17/2025 11:06:37 AM]] Processed line 15
+[[06/17/2025 11:06:37 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Hassan (Organizer)\n- Homayoo\n- Noumo\n- Andrew\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:06:37 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:06:41 AM]] Processed line 14
+[[06/17/2025 11:06:42 AM]] Processed line 13
+[[06/17/2025 11:06:43 AM]] Processed line 16
+[[06/17/2025 11:06:44 AM]] Processed line 17
+[[06/17/2025 11:06:46 AM]] Processed line 18
+[[06/17/2025 11:06:47 AM]] Processed line 19
+[[06/17/2025 11:06:47 AM]] Processed 20/41 items
+[[06/17/2025 11:06:49 AM]] Processed line 20
+[[06/17/2025 11:06:50 AM]] Processed line 21
+[[06/17/2025 11:06:52 AM]] Processed line 22
+[[06/17/2025 11:06:53 AM]] Processed line 23
+[[06/17/2025 11:06:54 AM]] Processed line 24
+[[06/17/2025 11:06:55 AM]] Processed line 25
+[[06/17/2025 11:06:57 AM]] Processed line 26
+[[06/17/2025 11:06:59 AM]] Processed line 27
+[[06/17/2025 11:07:01 AM]] Processed line 28
+[[06/17/2025 11:07:02 AM]] Processed line 29
+[[06/17/2025 11:07:02 AM]] Processed 30/41 items
+[[06/17/2025 11:07:03 AM]] Processed line 0
+[[06/17/2025 11:07:06 AM]] Processed line 1
+[[06/17/2025 11:07:06 AM]] Processed line 2
+[[06/17/2025 11:07:09 AM]] Processed line 3
+[[06/17/2025 11:07:14 AM]] Processed line 4
+[[06/17/2025 11:07:18 AM]] Processed line 5
+[[06/17/2025 11:07:20 AM]] Processed line 8
+[[06/17/2025 11:07:22 AM]] Processed line 7
+[[06/17/2025 11:07:23 AM]] Processed line 6
+[[06/17/2025 11:07:24 AM]] Processed line 11
+[[06/17/2025 11:07:24 AM]] Processed 10/41 items
+[[06/17/2025 11:07:25 AM]] Processed line 9
+[[06/17/2025 11:07:27 AM]] Processed line 10
+[[06/17/2025 11:07:28 AM]] Processed line 13
+[[06/17/2025 11:07:32 AM]] Processed line 14
+[[06/17/2025 11:07:33 AM]] Processed line 12
+[[06/17/2025 11:07:35 AM]] Processed line 15
+[[06/17/2025 11:07:36 AM]] Processed line 30
+[[06/17/2025 11:07:37 AM]] Processed line 31
+[[06/17/2025 11:07:37 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Hassan (Organizer)\n- Homayoo\n- Noumo\n- Andrew\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:07:37 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:07:38 AM]] Processed line 32
+[[06/17/2025 11:07:40 AM]] Processed line 33
+[[06/17/2025 11:07:41 AM]] Processed line 34
+[[06/17/2025 11:07:43 AM]] Processed line 35
+[[06/17/2025 11:07:44 AM]] Processed line 36
+[[06/17/2025 11:07:46 AM]] Processed line 37
+[[06/17/2025 11:07:49 AM]] Processed line 38
+[[06/17/2025 11:07:51 AM]] Processed line 39
+[[06/17/2025 11:07:51 AM]] Processed 40/41 items
+[[06/17/2025 11:07:52 AM]] Processed line 40
+[[06/17/2025 11:07:52 AM]] Returning generated strokes
+[[06/17/2025 11:07:53 AM]] Processed line 16
+[[06/17/2025 11:07:54 AM]] Processed line 17
+[[06/17/2025 11:07:56 AM]] Processed line 18
+[[06/17/2025 11:07:58 AM]] Processed line 19
+[[06/17/2025 11:07:58 AM]] Processed 20/41 items
+[[06/17/2025 11:07:59 AM]] Processed line 20
+[[06/17/2025 11:08:00 AM]] Processed line 21
+[[06/17/2025 11:08:02 AM]] Processed line 22
+[[06/17/2025 11:08:03 AM]] Processed line 23
+[[06/17/2025 11:08:04 AM]] Processed line 24
+[[06/17/2025 11:08:05 AM]] Processed line 25
+[[06/17/2025 11:08:08 AM]] Processed line 26
+[[06/17/2025 11:08:09 AM]] Processed line 27
+[[06/17/2025 11:08:11 AM]] Processed line 28
+[[06/17/2025 11:08:13 AM]] Processed line 29
+[[06/17/2025 11:08:13 AM]] Processed 30/41 items
+[[06/17/2025 11:08:13 AM]] Processed line 30
+[[06/17/2025 11:08:15 AM]] Processed line 31
+[[06/17/2025 11:08:16 AM]] Processed line 0
+[[06/17/2025 11:08:19 AM]] Processed line 1
+[[06/17/2025 11:08:19 AM]] Processed line 2
+[[06/17/2025 11:08:22 AM]] Processed line 3
+[[06/17/2025 11:08:25 AM]] Processed line 5
+[[06/17/2025 11:08:30 AM]] Processed line 4
+[[06/17/2025 11:08:32 AM]] Processed line 6
+[[06/17/2025 11:08:34 AM]] Processed line 7
+[[06/17/2025 11:08:36 AM]] Processed line 8
+[[06/17/2025 11:08:38 AM]] Processed line 9
+[[06/17/2025 11:08:38 AM]] Processed 10/41 items
+[[06/17/2025 11:08:38 AM]] Processed line 11
+[[06/17/2025 11:08:39 AM]] Processed line 13
+[[06/17/2025 11:08:40 AM]] Processed line 10
+[[06/17/2025 11:08:40 AM]] Processed line 12
+[[06/17/2025 11:08:41 AM]] Processed line 15
+[[06/17/2025 11:08:43 AM]] Processed line 14
+[[06/17/2025 11:08:43 AM]] Processed line 32
+[[06/17/2025 11:08:44 AM]] Processed line 33
+[[06/17/2025 11:08:45 AM]] Processed line 34
+[[06/17/2025 11:08:46 AM]] Processed line 35
+[[06/17/2025 11:08:46 AM]] Processed line 36
+[[06/17/2025 11:08:47 AM]] Processed line 37
+[[06/17/2025 11:08:49 AM]] Processed line 38
+[[06/17/2025 11:08:50 AM]] Processed line 39
+[[06/17/2025 11:08:50 AM]] Processed 40/41 items
+[[06/17/2025 11:08:50 AM]] Processed line 40
+[[06/17/2025 11:08:50 AM]] Returning generated strokes
+[[06/17/2025 11:08:51 AM]] Processed line 16
+[[06/17/2025 11:08:51 AM]] Processed line 17
+[[06/17/2025 11:08:52 AM]] Processed line 18
+[[06/17/2025 11:08:53 AM]] Processed line 19
+[[06/17/2025 11:08:53 AM]] Processed 20/41 items
+[[06/17/2025 11:08:54 AM]] Processed line 20
+[[06/17/2025 11:08:54 AM]] Processed line 21
+[[06/17/2025 11:08:55 AM]] Processed line 22
+[[06/17/2025 11:08:56 AM]] Processed line 23
+[[06/17/2025 11:08:56 AM]] Processed line 24
+[[06/17/2025 11:08:57 AM]] Processed line 25
+[[06/17/2025 11:08:58 AM]] Processed line 26
+[[06/17/2025 11:08:59 AM]] Processed line 27
+[[06/17/2025 11:08:59 AM]] Processed line 28
+[[06/17/2025 11:09:00 AM]] Processed line 29
+[[06/17/2025 11:09:00 AM]] Processed 30/41 items
+[[06/17/2025 11:09:01 AM]] Processed line 30
+[[06/17/2025 11:09:02 AM]] Processed line 31
+[[06/17/2025 11:09:02 AM]] Processed line 32
+[[06/17/2025 11:09:03 AM]] Processed line 33
+[[06/17/2025 11:09:03 AM]] Processed line 34
+[[06/17/2025 11:09:04 AM]] Processed line 35
+[[06/17/2025 11:09:05 AM]] Processed line 36
+[[06/17/2025 11:09:06 AM]] Processed line 37
+[[06/17/2025 11:09:07 AM]] Processed line 38
+[[06/17/2025 11:09:08 AM]] Processed line 39
+[[06/17/2025 11:09:08 AM]] Processed 40/41 items
+[[06/17/2025 11:09:09 AM]] Processed line 40
+[[06/17/2025 11:09:09 AM]] Returning generated strokes
+[[06/17/2025 11:33:10 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Jordan (Organizer)\n- Hassar\n- Homayo\n- Noumo\n- Andrew West\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:33:10 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:33:13 AM]] Processed line 1
+[[06/17/2025 11:33:13 AM]] Processed line 0
+[[06/17/2025 11:33:16 AM]] Processed line 3
+[[06/17/2025 11:33:20 AM]] Processed line 4
+[[06/17/2025 11:33:22 AM]] Processed line 6
+[[06/17/2025 11:33:26 AM]] Processed line 5
+[[06/17/2025 11:33:27 AM]] Processed line 2
+[[06/17/2025 11:33:28 AM]] Processed line 7
+[[06/17/2025 11:33:31 AM]] Processed line 8
+[[06/17/2025 11:33:32 AM]] Processed line 12
+[[06/17/2025 11:33:32 AM]] Processed 10/42 items
+[[06/17/2025 11:33:34 AM]] Processed line 9
+[[06/17/2025 11:33:36 AM]] Processed line 10
+[[06/17/2025 11:33:36 AM]] Processed line 11
+[[06/17/2025 11:33:38 AM]] Processed line 13
+[[06/17/2025 11:33:40 AM]] Processed line 15
+[[06/17/2025 11:33:44 AM]] Processed line 14
+[[06/17/2025 11:33:44 AM]] Processed line 16
+[[06/17/2025 11:33:46 AM]] Processed line 17
+[[06/17/2025 11:33:47 AM]] Processed line 18
+[[06/17/2025 11:33:49 AM]] Processed line 19
+[[06/17/2025 11:33:49 AM]] Processed 20/42 items
+[[06/17/2025 11:33:51 AM]] Processed line 20
+[[06/17/2025 11:33:52 AM]] Processed line 21
+[[06/17/2025 11:33:53 AM]] Processed line 22
+[[06/17/2025 11:33:55 AM]] Processed line 23
+[[06/17/2025 11:33:57 AM]] Processed line 24
+[[06/17/2025 11:33:57 AM]] Processed line 25
+[[06/17/2025 11:33:59 AM]] Processed line 26
+[[06/17/2025 11:34:01 AM]] Processed line 27
+[[06/17/2025 11:34:03 AM]] Processed line 28
+[[06/17/2025 11:34:04 AM]] Processed line 29
+[[06/17/2025 11:34:04 AM]] Processed 30/42 items
+[[06/17/2025 11:34:06 AM]] Processed line 30
+[[06/17/2025 11:34:07 AM]] Processed line 31
+[[06/17/2025 11:34:09 AM]] Processed line 32
+[[06/17/2025 11:34:10 AM]] Processed line 33
+[[06/17/2025 11:34:10 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Jordan (Organizer)\n- Hassar\n- Homayo\n- Noumo\n- Andrew West\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:34:10 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:34:11 AM]] Processed line 34
+[[06/17/2025 11:34:13 AM]] Processed line 35
+[[06/17/2025 11:34:14 AM]] Processed line 36
+[[06/17/2025 11:34:16 AM]] Processed line 37
+[[06/17/2025 11:34:18 AM]] Processed line 38
+[[06/17/2025 11:34:21 AM]] Processed line 39
+[[06/17/2025 11:34:21 AM]] Processed 40/42 items
+[[06/17/2025 11:34:22 AM]] Processed line 40
+[[06/17/2025 11:34:24 AM]] Processed line 41
+[[06/17/2025 11:34:24 AM]] Returning generated strokes
+[[06/17/2025 11:34:27 AM]] Processed line 1
+[[06/17/2025 11:34:28 AM]] Processed line 0
+[[06/17/2025 11:34:30 AM]] Processed line 3
+[[06/17/2025 11:34:34 AM]] Processed line 5
+[[06/17/2025 11:34:36 AM]] Processed line 6
+[[06/17/2025 11:34:41 AM]] Processed line 4
+[[06/17/2025 11:34:42 AM]] Processed line 2
+[[06/17/2025 11:34:43 AM]] Processed line 7
+[[06/17/2025 11:34:45 AM]] Processed line 9
+[[06/17/2025 11:34:48 AM]] Processed line 8
+[[06/17/2025 11:34:48 AM]] Processed 10/42 items
+[[06/17/2025 11:34:49 AM]] Processed line 10
+[[06/17/2025 11:34:50 AM]] Processed line 11
+[[06/17/2025 11:34:51 AM]] Processed line 13
+[[06/17/2025 11:34:53 AM]] Processed line 12
+[[06/17/2025 11:34:57 AM]] Processed line 14
+[[06/17/2025 11:34:59 AM]] Processed line 15
+[[06/17/2025 11:34:59 AM]] Processed line 16
+[[06/17/2025 11:35:01 AM]] Processed line 17
+[[06/17/2025 11:35:03 AM]] Processed line 18
+[[06/17/2025 11:35:04 AM]] Processed line 19
+[[06/17/2025 11:35:04 AM]] Processed 20/42 items
+[[06/17/2025 11:35:06 AM]] Processed line 20
+[[06/17/2025 11:35:07 AM]] Processed line 21
+[[06/17/2025 11:35:08 AM]] Processed line 22
+[[06/17/2025 11:35:10 AM]] Processing markdown: markdown='\n# Ink AI Daily Standup\n\n## Meeting Brief\n- Daily standup meeting for Ink AI team\n- Focus on project updates and blockers\n- Attended by core Ink AI and Jumpfast members\n\n## Time & Location\n- Monday, June 9th, 4:00 PM\n- Google Meet\n\n## Attendees\n- Jordan (Organizer)\n- Hassar\n- Homayo\n- Noumo\n- Andrew West\n- Chirag\n\n## Suggested Talking Points\n- Current progress on key tasks\n- Any blockers or challenges faced\n- Priorities for the day\n- Coordination between Ink AI and Jumpfast teams\n' style_id=3 ref_strokes=[] screen_width=800 screen_height=600
+[[06/17/2025 11:35:10 AM]] Using 16 worker threads with 32 CPU cores
+[[06/17/2025 11:35:10 AM]] Processed line 23
+[[06/17/2025 11:35:12 AM]] Processed line 24
+[[06/17/2025 11:35:12 AM]] Processed line 25
+[[06/17/2025 11:35:14 AM]] Processed line 26
+[[06/17/2025 11:35:17 AM]] Processed line 27
+[[06/17/2025 11:35:18 AM]] Processed line 28
+[[06/17/2025 11:35:20 AM]] Processed line 29
+[[06/17/2025 11:35:20 AM]] Processed 30/42 items
+[[06/17/2025 11:35:22 AM]] Processed line 30
+[[06/17/2025 11:35:23 AM]] Processed line 31
+[[06/17/2025 11:35:24 AM]] Processed line 32
+[[06/17/2025 11:35:25 AM]] Processed line 33
+[[06/17/2025 11:35:27 AM]] Processed line 34
+[[06/17/2025 11:35:28 AM]] Processed line 35
+[[06/17/2025 11:35:30 AM]] Processed line 36
+[[06/17/2025 11:35:32 AM]] Processed line 37
+[[06/17/2025 11:35:34 AM]] Processed line 38
+[[06/17/2025 11:35:34 AM]] Processed line 0
+[[06/17/2025 11:35:35 AM]] Processed line 2
+[[06/17/2025 11:35:38 AM]] Processed line 1
+[[06/17/2025 11:35:40 AM]] Processed line 7
+[[06/17/2025 11:35:45 AM]] Processed line 4
+[[06/17/2025 11:35:48 AM]] Processed line 3
+[[06/17/2025 11:35:52 AM]] Processed line 5
+[[06/17/2025 11:35:54 AM]] Processed line 6
+[[06/17/2025 11:35:55 AM]] Processed line 9
+[[06/17/2025 11:35:58 AM]] Processed line 8
+[[06/17/2025 11:35:58 AM]] Processed 10/42 items
+[[06/17/2025 11:35:59 AM]] Processed line 11
+[[06/17/2025 11:36:00 AM]] Processed line 12
+[[06/17/2025 11:36:01 AM]] Processed line 10
+[[06/17/2025 11:36:05 AM]] Processed line 14
+[[06/17/2025 11:36:07 AM]] Processed line 15
+[[06/17/2025 11:36:09 AM]] Processed line 13
+[[06/17/2025 11:36:11 AM]] Processed line 39
+[[06/17/2025 11:36:11 AM]] Processed 40/42 items
+[[06/17/2025 11:36:13 AM]] Processed line 40
+[[06/17/2025 11:36:14 AM]] Processed line 41
+[[06/17/2025 11:36:14 AM]] Returning generated strokes
+[[06/17/2025 11:36:15 AM]] Processed line 16
+[[06/17/2025 11:36:17 AM]] Processed line 17
+[[06/17/2025 11:36:17 AM]] Processed line 18
+[[06/17/2025 11:36:18 AM]] Processed line 19
+[[06/17/2025 11:36:18 AM]] Processed 20/42 items
+[[06/17/2025 11:36:19 AM]] Processed line 20
+[[06/17/2025 11:36:20 AM]] Processed line 21
+[[06/17/2025 11:36:21 AM]] Processed line 22
+[[06/17/2025 11:36:22 AM]] Processed line 23
+[[06/17/2025 11:36:22 AM]] Processed line 24
+[[06/17/2025 11:36:23 AM]] Processed line 25
+[[06/17/2025 11:36:24 AM]] Processed line 26
+[[06/17/2025 11:36:25 AM]] Processed line 27
+[[06/17/2025 11:36:26 AM]] Processed line 28
+[[06/17/2025 11:36:27 AM]] Processed line 29
+[[06/17/2025 11:36:27 AM]] Processed 30/42 items
+[[06/17/2025 11:36:28 AM]] Processed line 30
+[[06/17/2025 11:36:28 AM]] Processed line 31
+[[06/17/2025 11:36:29 AM]] Processed line 32
+[[06/17/2025 11:36:30 AM]] Processed line 33
+[[06/17/2025 11:36:31 AM]] Processed line 34
+[[06/17/2025 11:36:31 AM]] Processed line 35
+[[06/17/2025 11:36:32 AM]] Processed line 36
+[[06/17/2025 11:36:33 AM]] Processed line 37
+[[06/17/2025 11:36:34 AM]] Processed line 38
+[[06/17/2025 11:36:36 AM]] Processed line 39
+[[06/17/2025 11:36:36 AM]] Processed 40/42 items
+[[06/17/2025 11:36:36 AM]] Processed line 40
+[[06/17/2025 11:36:37 AM]] Processed line 41
+[[06/17/2025 11:36:37 AM]] Returning generated strokes
+[[06/17/2025 11:43:27 AM]] Shutting down
+[[06/17/2025 11:43:27 AM]] Waiting for application shutdown.
+[[06/17/2025 11:43:27 AM]] Application shutdown complete.
+[[06/17/2025 11:43:27 AM]] Finished server process [6550]

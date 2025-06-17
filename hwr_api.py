@@ -394,9 +394,12 @@ def process_stroke(item, stroke, initial_coord, screen_width=800, screen_height=
             "metadata": meta,
         }
 
-    # Calculate responsive scaling factor based on screen width and font scale
+    # Calculate a responsive scaling factor for handwriting size:
+    # - (screen_width / base_width): scales proportionally to the screen width (base is 800px)
+    # - * 1.1: increases the base size by 10% to make the handwriting larger and more readable.
+    # - min(..., 1.4): caps the scaling factor at 1.4 to prevent handwriting from becoming excessively large.
     base_width = 800
-    base_scale_factor = min((screen_width / base_width) * 0.8, 1.2)  # Base scaling
+    base_scale_factor = min((screen_width / base_width) * 1.1, 1.4)
     
     # Apply font scaling for headers and other elements
     font_scale = meta.get("font_scale", 1.0)
@@ -412,48 +415,9 @@ def process_stroke(item, stroke, initial_coord, screen_width=800, screen_height=
     coords[:, 1] *= -1
 
     # Place chunk around initial_coord with bounds consideration
-    coords[:, :2] = coords[:, :2] - coords[:, :2].min() + initial_coord
-
-    # Apply enhanced responsive indentation based on element type and nesting
-    indent = meta.get("indent", 0)
-    nesting_level = meta.get("nesting_level", 0)
-    element_type = meta.get("type", "paragraph")
-    
-    # Calculate base indent size responsive to screen width
-    base_indent_size = max(20, screen_width * 0.025)  # 2.5% of screen width, minimum 20px
-    
-    # Different indentation strategies for different element types
-    if element_type == "header":
-        # All headers get minimal indentation, no special centering for H1
-        # =====================================
-        indent_offset = base_indent_size * 0.2  # Reduced from 0.5 to move headers back 
-    elif element_type in ["bullet", "numbered"]:
-        # List items get progressive indentation based on nesting
-        list_base_indent = base_indent_size * 1.5  # Larger base for lists
-        nesting_indent = nesting_level * base_indent_size * 0.8  # Additional per nesting level
-        indent_offset = list_base_indent + nesting_indent
-        
-        # Add bullet/number symbol spacing
-        if element_type == "bullet":
-            indent_offset += base_indent_size * 0.3  # Space for bullet symbol
-        else:  # numbered
-            indent_offset += base_indent_size * 0.5  # Space for number
-            
-    elif element_type == "blockquote":
-        # Blockquotes get distinctive indentation
-        quote_base_indent = base_indent_size * 2.0  # Larger base for quotes
-        nesting_indent = nesting_level * base_indent_size * 0.6
-        indent_offset = quote_base_indent + nesting_indent
-    else:
-        # Regular paragraphs - give them more indentation than headers for visual hierarchy
-        # =====================================
-        indent_offset = base_indent_size * 5.0  # Increased from 2.0 to 3.0 for more paragraph indentation
-    
-    # Ensure indentation doesn't exceed reasonable bounds
-    max_indent_offset = screen_width * 0.40  # Increased from 0.15 to 0.30 (30% of screen width) to allow more indentation
-    indent_offset = min(indent_offset, max_indent_offset)
-    
-    coords[:, 0] += indent_offset
+    # The .min(axis=0) ensures we normalize x and y independently,
+    # preserving the aspect ratio of the generated strokes.
+    coords[:, :2] = coords[:, :2] - coords[:, :2].min(axis=0) + initial_coord
 
     stroke_coords = coords.tolist()
     stroke_segments = split_stroke_by_eos(stroke_coords)
@@ -473,85 +437,91 @@ def process_stroke(item, stroke, initial_coord, screen_width=800, screen_height=
 def combine_segments_as_one_line(list_of_segments, screen_width=800, screen_height=600, spacing=None):
     """
     Takes a list of sub-segment stroke data and places each 
-    sub-segment horizontally after the previous one with responsive spacing.
-    Handles text wrapping when content exceeds screen width with improved spacing.
-    For single segments, preserves the existing indentation.
+    sub-segment horizontally with automatic wrapping when exceeding screen width.
+    Maintains rightward shift and proper bullet spacing.
     """
     if not list_of_segments:
         return []
     
-    # If there's only one segment, preserve its existing positioning (indentation)
-    if len(list_of_segments) == 1:
-        seg = list_of_segments[0]
-        if seg:
-            return seg
-        else:
-            return []
+    # Calculate responsive layout parameters
+    margin = max(15, screen_width * 0.05)  # 5% margin (minimum 15px)
+    fixed_right_shift = screen_width * 0.3  # Matches ensure_bounds_preserve_spacing
+    available_width = screen_width - 2 * margin - fixed_right_shift
+    line_height = max(40, screen_height * 0.08)  # Responsive line height
     
-    # Calculate responsive spacing based on screen width
-    if spacing is None:
-        # More sophisticated spacing calculation
-        base_spacing = max(8, screen_width * 0.02)  # 2% of screen width, minimum 8px
-        spacing = base_spacing
-    
-    # Calculate responsive margins and line height
-    margin = max(15, screen_width * 0.025)  # 2.5% margin, minimum 15px
-    available_width = screen_width - 2 * margin
-    
-    # Responsive line height based on screen dimensions
-    base_line_height = max(40, screen_height * 0.08)  # 8% of screen height, minimum 40px
-    line_height = base_line_height
-    
-    x_offset = margin  # Start with margin
+    x_offset = margin + fixed_right_shift  # Start position with rightward shift
     y_offset = 0
     combined_strokes = []
 
     for seg in list_of_segments:
-        # seg is a list of strokes (each stroke is list of [x,y])
-        if not seg:
+        if not seg or not any(seg):
             continue
             
-        # Calculate segment bounds more accurately
-        min_x = float('inf')
-        max_x = float('-inf')
-        min_y = float('inf')
-        max_y = float('-inf')
+        # Calculate segment dimensions
+        all_x = [pt[0] for stroke in seg for pt in stroke]
+        all_y = [pt[1] for stroke in seg for pt in stroke]
+        width = max(all_x) - min(all_x) if all_x else 0
+        height = max(all_y) - min(all_y) if all_y else 0
         
-        for stroke in seg:
-            for (x, y) in stroke:
-                min_x = min(min_x, x)
-                max_x = max(max_x, x)
-                min_y = min(min_y, y)
-                max_y = max(max_y, y)
-
-        width_of_segment = max_x - min_x if max_x > min_x else 0
-        height_of_segment = max_y - min_y if max_y > min_y else 0
-        
-        # Check if this segment would exceed the available width
-        if x_offset + width_of_segment > available_width and x_offset > margin:
-            # Wrap to next line
-            x_offset = margin
+        # Wrap to new line if segment exceeds available width
+        if x_offset + width > available_width and x_offset > margin + fixed_right_shift:
+            x_offset = margin + fixed_right_shift
             y_offset += line_height
         
-        # Calculate shifts for positioning
-        x_shift = x_offset - min_x
-        y_shift = y_offset - min_y
-
-        # Shift all strokes in this segment
+        # Calculate required shifts
+        x_shift = x_offset - (min(all_x) if all_x else 0)
+        y_shift = y_offset - (min(all_y) if all_y else 0)
+        
+        # Apply shifts to all points in segment
         shifted_segment = []
         for stroke in seg:
-            shifted_stroke = []
-            for (x, y) in stroke:
-                shifted_stroke.append([x + x_shift, y + y_shift])
+            shifted_stroke = [[pt[0] + x_shift, pt[1] + y_shift] for pt in stroke]
             shifted_segment.append(shifted_stroke)
-
-        # Add to combined list
+        
         combined_strokes.extend(shifted_segment)
-
-        # Advance x_offset for the next segment with responsive spacing
-        x_offset += width_of_segment + spacing
+        
+        # Update x_offset with dynamic spacing
+        x_offset += width + (spacing if spacing is not None else max(8, width * 0.2))
 
     return combined_strokes
+
+def calculate_indentation(metadata, screen_width):
+    """
+    Calculate the indentation offset for a given line based on its metadata.
+    """
+    indent = metadata.get("indent", 0)
+    nesting_level = metadata.get("nesting_level", 0)
+    element_type = metadata.get("type", "paragraph")
+    
+    # Calculate base indent size responsive to screen width
+    base_indent_size = max(20, screen_width * 0.025)  # 2.5% of screen width, minimum 20px
+    
+    indent_offset = 0
+    # Different indentation strategies for different element types
+    if element_type == "header":
+        indent_offset = base_indent_size * 0.2
+    elif element_type in ["bullet", "numbered"]:
+        list_base_indent = base_indent_size * 2.5
+        nesting_indent = nesting_level * base_indent_size * 1.5
+        indent_offset = list_base_indent + nesting_indent
+        
+        if element_type == "bullet":
+            indent_offset += base_indent_size * 0.3
+        else:
+            indent_offset += base_indent_size * 0.5
+            
+    elif element_type == "blockquote":
+        quote_base_indent = base_indent_size * 2.0
+        nesting_indent = nesting_level * base_indent_size * 0.6
+        indent_offset = quote_base_indent + nesting_indent
+    else:
+        indent_offset = base_indent_size * 5.0
+    
+    # Ensure indentation doesn't exceed reasonable bounds
+    max_indent_offset = screen_width * 0.40
+    indent_offset = min(indent_offset, max_indent_offset)
+    
+    return indent_offset
 
 def build_input_tensors(item, text_len):
     """
@@ -734,12 +704,13 @@ def convert_markdown(request: MarkdownRequest):
 
     Notes:
         - The endpoint supports parallel processing of lines for better performance
-        - If reference strokes are provided, a quality check is performed
+        - If reference strokes are provided, a quality check is performed on first 5 words only
         - If the quality check fails, it falls back to default style generation
         - The endpoint maintains markdown formatting like headers, lists, and indentation
     """
     # 1) Parse markdown → lines + metadata
     try:
+        logging.info(f"Processing markdown: {request}")
         lines, metadata = parse_markdown(request.markdown)
         joined = "\n".join(lines)
         styles, biases, stroke_colors, stroke_widths = metadata_to_style(
@@ -765,21 +736,102 @@ def convert_markdown(request: MarkdownRequest):
             "stroke_color": sc
         })
 
+    # Check if reference style strokes were provided
+    ref_strokes = request.ref_strokes
+    screen_width = request.screen_width
+    screen_height = request.screen_height
+    
+    # If we have ref_strokes, perform quality check on first 5 words only
+    if ref_strokes:
+        logging.info("Reference strokes provided, performing quality check on first 5 words")
+        
+        # Extract first 5 words from the text for quality checking
+        all_text = " ".join([item["line"] for item in indexed_items if item["line"].strip()])
+        words = all_text.split()
+        first_5_words = " ".join(words[:5]) if words else ""
+        
+        if first_5_words:
+            try:
+                # Create a minimal test item with first 5 words
+                test_item = {
+                    "index": 0,
+                    "line": first_5_words,
+                    "metadata": {"type": "paragraph", "indent": 0, "font_scale": 1.0},
+                    "bias": 0.75,
+                    "style": request.style_id,
+                    "stroke_width": 1,
+                    "stroke_color": "black"
+                }
+                
+                # Process only the test item
+                logging.info(f"Processing test phrase for quality check: '{first_5_words}'")
+                test_result = process_single_item(test_item, ref_strokes, screen_width, screen_height)
+                
+                # Create temporary image for quality check
+                temp_path = None
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                    temp_path = temp_file.name
+                
+                # Save test strokes to image
+                test_strokes = test_result["strokes"]
+                if test_strokes:
+                    logging.info(f"Saving {len(test_strokes)} test stroke groups for quality check")
+                    save_strokes_to_image(test_strokes, temp_path)
+                    
+                    # Check handwriting quality
+                    quality_check = check_handwriting_quality(temp_path)
+                    
+                    # Clean up the temporary file
+                    try:
+                        if os.path.exists(temp_path):
+                            os.unlink(temp_path)
+                            logging.debug(f"Cleaned up temporary file: {temp_path}")
+                    except Exception as e:
+                        logging.error(f"Error cleaning up temporary file {temp_path}: {e}")
+                    
+                    # If quality check fails, regenerate with default style (prevent recursion)
+                    if not quality_check:
+                        logging.info("Handwriting quality check FAILED on test phrase, regenerating with default style")
+                        fallback_request = MarkdownRequest(
+                            markdown=request.markdown,
+                            style_id=request.style_id,
+                            ref_strokes=None,  # Remove ref_strokes to prevent recursion
+                            screen_width=request.screen_width,
+                            screen_height=request.screen_height
+                        )
+                        return convert_markdown(fallback_request)
+                    else:
+                        logging.info("Handwriting quality check PASSED on test phrase, proceeding with full generation")
+                else:
+                    logging.warning("No test strokes generated, proceeding with full generation")
+                    
+            except Exception as e:
+                logging.error(f"Error during test phrase quality check: {e}")
+                logging.info("Falling back to default style due to quality check error")
+                fallback_request = MarkdownRequest(
+                    markdown=request.markdown,
+                    style_id=request.style_id,
+                    ref_strokes=None,  # Remove ref_strokes to prevent recursion
+                    screen_width=request.screen_width,
+                    screen_height=request.screen_height
+                )
+                return convert_markdown(fallback_request)
+        else:
+            logging.warning("No words found for quality check, proceeding with full generation")
+
+    # Use screen dimensions from the request to set responsive line spacing
+    screen_width = request.screen_width
+    screen_height = request.screen_height
+
+    # Responsive line spacing: 10% of screen height, min 30, max 60
+    line_spacing = max(30, min(screen_height * 0.10, 60))
+    
     # Determine optimal number of threads based on CPU count
     cpu_count = os.cpu_count() or 4
     # Use 2x CPU count for I/O bound tasks, but cap to avoid too much overhead
     max_workers = min(cpu_count * 2, 16)
     
     logging.info(f"Using {max_workers} worker threads with {cpu_count} CPU cores")
-
-    # Check if reference style strokes were provided
-    ref_strokes = request.ref_strokes
-    screen_width = request.screen_width
-    screen_height = request.screen_height
-    
-    # Calculate responsive line spacing based on screen height
-    base_height = 600
-    line_spacing = max(25, (screen_height / base_height) * 35)  # Reduced from 50 to 35
     
     # Process items in parallel using thread pool
     try:
@@ -845,26 +897,53 @@ def convert_markdown(request: MarkdownRequest):
         grp["segments"].append(entry["strokes"])
 
     merged_output = []
-    cumulative_y_offset = 0  # Track cumulative vertical position
-    
+    # Start with a small top margin. This will track the "bottom" of the rendered content.
+    cumulative_y_offset = 20.0
+
     for gid in sorted(grouped):
         group = grouped[gid]
         text = " ".join(filter(None, group["lines"]))
         combined = combine_segments_as_one_line(group["segments"], screen_width, screen_height)
 
-        # Calculate dynamic spacing for this group based on its metadata
         group_metadata = group["metadata"]
-        dynamic_spacing = calculate_dynamic_spacing(
+
+        # Calculate indentation and apply it
+        indent_offset = calculate_indentation(group_metadata, screen_width)
+        if indent_offset > 0:
+            for stroke in combined:
+                for pt in stroke:
+                    pt[0] += indent_offset
+
+        # Calculate the vertical gap needed before this line.
+        spacing = calculate_dynamic_spacing(
             group_metadata, screen_width, screen_height, line_spacing
         )
+
+        # For empty lines (which have no strokes), just add the spacing gap and move on.
+        if not combined:
+            if group_metadata.get("type") == "empty":
+                cumulative_y_offset += spacing
+            continue
+
+        # Find the bounding box of the strokes to get their true top and height.
+        all_y = [pt[1] for stroke in combined for pt in stroke]
+        min_y, max_y = min(all_y), max(all_y)
+        height_of_group = max_y - min_y
         
-        # Apply the calculated vertical offset
+        # The new top position is the previous bottom plus the calculated spacing.
+        target_y = cumulative_y_offset + spacing
+        
+        # The amount to shift is the difference between the target top (target_y)
+        # and the strokes' current top (min_y).
+        y_shift = target_y - min_y
+        
+        # Apply the vertical shift to all points in the group.
         for stroke in combined:
             for pt in stroke:
-                pt[1] += cumulative_y_offset
+                pt[1] += y_shift
         
-        # Update cumulative offset for next group
-        cumulative_y_offset += dynamic_spacing
+        # Update the cumulative offset to the new bottom of the content.
+        cumulative_y_offset = target_y + height_of_group
 
         merged_output.append({
             "line": text,
@@ -877,73 +956,8 @@ def convert_markdown(request: MarkdownRequest):
     # Apply final bounds checking that preserves line spacing
     merged_output = ensure_bounds_preserve_spacing(merged_output, screen_width, screen_height)
 
-    # If we have ref_strokes, check the quality of the generated handwriting
-    if ref_strokes:
-        logging.info("Reference strokes provided, performing quality check")
-        temp_path = None
-        try:
-            # Create a temporary file for the image
-            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-                temp_path = temp_file.name
-            
-            # Save all strokes to the temporary image
-            all_strokes = [stroke for item in merged_output for stroke in item["strokes"]]
-            if not all_strokes:
-                logging.warning("No strokes generated for quality check, using default style")
-                return convert_markdown(MarkdownRequest(
-                    markdown=request.markdown,
-                    style_id=request.style_id,
-                    ref_strokes=None,
-                    screen_width=request.screen_width,
-                    screen_height=request.screen_height
-                ))
-            
-            logging.info(f"Saving {len(all_strokes)} stroke groups for quality check")
-            save_strokes_to_image(all_strokes, temp_path)
-            
-            # Check handwriting quality
-            quality_check = check_handwriting_quality(temp_path)
-            
-            # If quality check passes, return the current strokes
-            if quality_check:
-                logging.info("Handwriting quality check PASSED with reference strokes")
-                return {"strokes": merged_output}
-            
-            # If quality check fails, regenerate with default style (prevent recursion)
-            logging.info("Handwriting quality check FAILED, regenerating with default style")
-            fallback_request = MarkdownRequest(
-                markdown=request.markdown,
-                style_id=request.style_id,
-                ref_strokes=None,  # Remove ref_strokes to prevent recursion
-                screen_width=request.screen_width,
-                screen_height=request.screen_height
-            )
-            return convert_markdown(fallback_request)
-            
-        except Exception as e:
-            logging.error(f"Error during handwriting quality check process: {e}")
-            # If there's an error in quality check, fall back to default style
-            logging.info("Falling back to default style due to quality check error")
-            fallback_request = MarkdownRequest(
-                markdown=request.markdown,
-                style_id=request.style_id,
-                ref_strokes=None,  # Remove ref_strokes to prevent recursion
-                screen_width=request.screen_width,
-                screen_height=request.screen_height
-            )
-            return convert_markdown(fallback_request)
-        finally:
-            # Clean up the temporary file
-            if temp_path:
-                try:
-                    if os.path.exists(temp_path):
-                        os.unlink(temp_path)
-                        logging.debug(f"Cleaned up temporary file: {temp_path}")
-                except Exception as e:
-                    logging.error(f"Error cleaning up temporary file {temp_path}: {e}")
-    
-    # If no ref_strokes provided, return the current strokes
-    logging.info("No reference strokes provided, returning generated strokes")
+    # Return the generated strokes
+    logging.info("Returning generated strokes")
     return {"strokes": merged_output}
 
 def save_strokes_to_image(strokes, output_path):
@@ -1078,7 +1092,7 @@ def ensure_bounds_preserve_spacing(merged_output, screen_width, screen_height, m
     """
     Ensure all stroke coordinates stay within canvas bounds while preserving 
     the relative spacing between lines and elements.
-    Now preserves indentation by not shifting all coordinates to start at margin.
+    Enforces a minimum scale to make strokes larger.
     """
     if not merged_output:
         return merged_output
@@ -1111,32 +1125,33 @@ def ensure_bounds_preserve_spacing(merged_output, screen_width, screen_height, m
     scale_y = available_height / current_height if current_height > 0 else 1.0
     
     # Use the smaller scale factor to maintain aspect ratio
-    scale = min(scale_x, scale_y, 1.0)  # Don't scale up, only down if needed
+    scale = min(scale_x, scale_y)
     
-    # Only apply scaling if we actually need to scale down
-    if scale < 1.0:
-        # Apply scaling while preserving relative positions and indentation
-        for group in merged_output:
-            for stroke in group["strokes"]:
-                for pt in stroke:
-                    # Scale coordinates around the origin, preserving relative positions
-                    pt[0] = pt[0] * scale
-                    pt[1] = pt[1] * scale
-        
-        # Recalculate bounds after scaling
-        all_x = []
-        all_y = []
-        for group in merged_output:
-            for stroke in group["strokes"]:
-                for pt in stroke:
-                    all_x.append(pt[0])
-                    all_y.append(pt[1])
-        
-        min_x, max_x = min(all_x), max(all_x)
-        min_y, max_y = min(all_y), max(all_y)
+    # Enforce a minimum scale to make strokes larger (e.g., 1.5x)
+    min_scale = 0.8
+    scale = max(scale, min_scale)  # Ensure strokes are never smaller than min_scale
     
-    # Apply translation only if content goes outside bounds
-    # Check if we need to shift to fit within screen bounds
+    # Apply scaling to make strokes larger while preserving relative positions
+    for group in merged_output:
+        for stroke in group["strokes"]:
+            for pt in stroke:
+                # Scale coordinates around the origin, preserving relative positions
+                pt[0] = pt[0] * scale
+                pt[1] = pt[1] * scale
+    
+    # Recalculate bounds after scaling
+    all_x = []
+    all_y = []
+    for group in merged_output:
+        for stroke in group["strokes"]:
+            for pt in stroke:
+                all_x.append(pt[0])
+                all_y.append(pt[1])
+    
+    min_x, max_x = min(all_x), max(all_x)
+    min_y, max_y = min(all_y), max(all_y)
+    
+    # Apply translation to fit within bounds
     shift_x = 0
     shift_y = 0
     
@@ -1149,6 +1164,10 @@ def ensure_bounds_preserve_spacing(merged_output, screen_width, screen_height, m
         shift_y = margin - min_y
     elif max_y > screen_height - margin:
         shift_y = (screen_height - margin) - max_y
+    
+    # Apply a fixed rightward shift (e.g., 100 pixels for more movement to the right)
+    fixed_right_shift = screen_width * 0.125  # Make shift responsive
+    shift_x += fixed_right_shift
     
     # Apply translation if needed
     if shift_x != 0 or shift_y != 0:
@@ -1164,46 +1183,42 @@ def calculate_dynamic_spacing(metadata, screen_width, screen_height, base_line_s
     """
     Calculate dynamic spacing for a line based on its metadata and screen dimensions.
     Returns the vertical offset to add for this line.
+    Now uses increased spacing for bullet points only.
     """
     element_type = metadata.get("type", "paragraph")
     spacing_before = metadata.get("spacing_before", 1.0)
-    spacing_after = metadata.get("spacing_after", 1.0)
     header_level = metadata.get("header_level", 0)
     
     # Base spacing calculation
-    spacing = base_line_spacing * spacing_before
+    spacing = base_line_spacing * spacing_before * 0.2
     
-    # Additional spacing adjustments based on element type
+    # Adjusted spacing multipliers
     if element_type == "header":
-        # Headers get extra spacing, more for higher level headers
         if header_level == 1:
-            spacing *= 1.2  # Reduced from 1.8
+            spacing *= 1.1
         elif header_level == 2:
-            spacing *= 1.15 # Reduced from 1.5
+            spacing *= 1.05
         elif header_level == 3:
-            spacing *= 1.1  # Reduced from 1.3
+            spacing *= 1.0
         else:
-            spacing *= 1.05 # Reduced from 1.2
+            spacing *= 0.95
             
     elif element_type in ["bullet", "numbered"]:
-        # List items get tighter spacing
         nesting_level = metadata.get("nesting_level", 0)
         if nesting_level == 0:
-            spacing *= 0.9  # First level lists slightly tighter
+            spacing *= 1.0  # Increased for top-level lists
         else:
-            spacing *= 0.7  # Nested lists much tighter
+            spacing *= 0.8  # Increased for nested lists
             
     elif element_type == "blockquote":
-        # Blockquotes get moderate extra spacing
-        spacing *= 1.1
+        spacing *= 0.9
         
     elif element_type == "empty":
-        # Empty lines create paragraph breaks
-        spacing *= 0.3
+        spacing *= 0.2
     
-    # Ensure minimum and maximum spacing bounds
-    min_spacing = base_line_spacing * 0.3
-    max_spacing = base_line_spacing * 3.0
+    # Bounds
+    min_spacing = base_line_spacing * 0.1
+    max_spacing = base_line_spacing * 1.5
     
     return max(min_spacing, min(spacing, max_spacing))
 
