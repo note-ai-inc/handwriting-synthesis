@@ -955,7 +955,10 @@ def convert_markdown(request: MarkdownRequest):
 
     # Apply final bounds checking that preserves line spacing
     merged_output = ensure_bounds_preserve_spacing(merged_output, screen_width, screen_height)
-
+    from tensorflow.python.client import device_lib
+    devices = device_lib.list_local_devices()
+    gpu_devices = [d.name for d in devices if d.device_type == 'GPU']
+    logging.info(f"✅ Active GPU devices during /convert: {gpu_devices}")
     # Return the generated strokes
     logging.info("Returning generated strokes")
     return {"strokes": merged_output}

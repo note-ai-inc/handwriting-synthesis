@@ -1,0 +1,245 @@
+[[06/18/2025 09:21:26 AM]] 
+new run with parameters:
+{'all_checkpoints_dir': 'checkpoints_style_synthesis/all_checkpoints',
+ 'attention_mixture_components': 10,
+ 'batch_size': 32,
+ 'batch_sizes': [32],
+ 'beta1_decay': 0.9,
+ 'beta1_decays': [0.9],
+ 'checkpoint_dir': 'checkpoints_style_synthesis',
+ 'early_stopping_steps': 2000,
+ 'enable_parameter_averaging': False,
+ 'grad_clip': 50,
+ 'keep_checkpoint_every_n_hours': 10000,
+ 'keep_prob_scalar': 1.0,
+ 'learning_rate': 0.0001,
+ 'learning_rates': [0.0001],
+ 'log_dir': 'logs_style_synthesis',
+ 'log_interval': 50,
+ 'logging_level': 20,
+ 'loss_averaging_window': 100,
+ 'lstm_size': 400,
+ 'max_to_keep': 5,
+ 'min_steps_to_checkpoint': 2000,
+ 'num_restarts': 0,
+ 'num_training_steps': 30000,
+ 'optimizer': 'rms',
+ 'output_mixture_components': 20,
+ 'output_units': 121,
+ 'patiences': [2000],
+ 'prediction_dir': 'predictions_style_synthesis',
+ 'reader': None,
+ 'regularization_constant': 0.0,
+ 'restart_idx': 0,
+ 'save_all_checkpoints': False,
+ 'style_embedding_size': 256,
+ 'validation_batch_size': 32,
+ 'warm_start_init_step': 0}
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:54: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
+
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:66: The name tf.placeholder_with_default is deprecated. Please use tf.compat.v1.placeholder_with_default instead.
+
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/init_ops.py:97: calling GlorotUniform.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
+Instructions for updating:
+Call initializer instance with the dtype argument instead of passing it to the constructor
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/init_ops.py:97: calling Orthogonal.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
+Instructions for updating:
+Call initializer instance with the dtype argument instead of passing it to the constructor
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/init_ops.py:97: calling Zeros.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
+Instructions for updating:
+Call initializer instance with the dtype argument instead of passing it to the constructor
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/resource_variable_ops.py:1630: calling BaseResourceVariable.__init__ (from tensorflow.python.ops.resource_variable_ops) with constraint is deprecated and will be removed in a future version.
+Instructions for updating:
+If using Keras pass *_constraint arguments to layers.
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:78: The name tf.summary.histogram is deprecated. Please use tf.compat.v1.summary.histogram instead.
+
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:97: dynamic_rnn (from tensorflow.python.ops.rnn) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `keras.layers.RNN(cell)`, which is equivalent to this API
+[[06/18/2025 09:21:26 AM]] From /app/model/rnn_cell.py:77: The name tf.variable_scope is deprecated. Please use tf.compat.v1.variable_scope instead.
+
+[[06/18/2025 09:21:26 AM]] From /app/model/rnn_cell.py:77: The name tf.AUTO_REUSE is deprecated. Please use tf.compat.v1.AUTO_REUSE instead.
+
+[[06/18/2025 09:21:26 AM]] From /app/model/rnn_cell.py:81: LSTMCell.__init__ (from tensorflow.python.ops.rnn_cell_impl) is deprecated and will be removed in a future version.
+Instructions for updating:
+This class is equivalent as tf.keras.layers.LSTMCell, and will be replaced by that in Tensorflow 2.0.
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/rnn_cell_impl.py:958: Layer.add_variable (from tensorflow.python.keras.engine.base_layer) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `layer.add_weight` method instead.
+[[06/18/2025 09:21:26 AM]] From /app/model/tf_utils.py:19: The name tf.get_variable is deprecated. Please use tf.compat.v1.get_variable instead.
+
+[[06/18/2025 09:21:26 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/rnn.py:244: where (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.where in 2.0, which has the same broadcast rule as np.where
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:148: The name tf.log is deprecated. Please use tf.math.log instead.
+
+[[06/18/2025 09:21:26 AM]] From /app/model/train.py:105: The name tf.summary.scalar is deprecated. Please use tf.compat.v1.summary.scalar instead.
+
+[[06/18/2025 09:21:27 AM]] From /app/model/rnn_cell.py:141: MultivariateNormalFullCovariance.__init__ (from tensorflow.contrib.distributions.python.ops.mvn_full_covariance) is deprecated and will be removed after 2018-10-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.contrib.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/mvn_full_covariance.py:195: MultivariateNormalTriL.__init__ (from tensorflow.contrib.distributions.python.ops.mvn_tril) is deprecated and will be removed after 2018-10-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.contrib.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/mvn_tril.py:222: MultivariateNormalLinearOperator.__init__ (from tensorflow.contrib.distributions.python.ops.mvn_linear_operator) is deprecated and will be removed after 2018-10-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.contrib.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/mvn_linear_operator.py:199: Normal.__init__ (from tensorflow.python.ops.distributions.normal) is deprecated and will be removed after 2019-01-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/distributions/normal.py:160: Distribution.__init__ (from tensorflow.python.ops.distributions.distribution) is deprecated and will be removed after 2019-01-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/mvn_linear_operator.py:201: AffineLinearOperator.__init__ (from tensorflow.contrib.distributions.python.ops.bijectors.affine_linear_operator) is deprecated and will be removed after 2018-10-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.contrib.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/bijectors/affine_linear_operator.py:158: _DistributionShape.__init__ (from tensorflow.contrib.distributions.python.ops.shape) is deprecated and will be removed after 2018-10-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.contrib.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/contrib/distributions/python/ops/mvn_linear_operator.py:205: TransformedDistribution.__init__ (from tensorflow.python.ops.distributions.transformed_distribution) is deprecated and will be removed after 2019-01-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.distributions`.
+[[06/18/2025 09:21:27 AM]] From /app/model/rnn_cell.py:142: Bernoulli.__init__ (from tensorflow.python.ops.distributions.bernoulli) is deprecated and will be removed after 2019-01-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.distributions`.
+[[06/18/2025 09:21:27 AM]] From /app/model/rnn_cell.py:143: Categorical.__init__ (from tensorflow.python.ops.distributions.categorical) is deprecated and will be removed after 2019-01-01.
+Instructions for updating:
+The TensorFlow Distributions library has moved to TensorFlow Probability (https://github.com/tensorflow/probability). You should update all references to use `tfp.distributions` instead of `tf.distributions`.
+[[06/18/2025 09:21:27 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/distributions/categorical.py:278: multinomial (from tensorflow.python.ops.random_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.random.categorical` instead.
+[[06/18/2025 09:21:28 AM]] From /app/model/tf_base_model.py:435: The name tf.train.RMSPropOptimizer is deprecated. Please use tf.compat.v1.train.RMSPropOptimizer instead.
+
+[[06/18/2025 09:21:29 AM]] From /app/model/tf_base_model.py:409: The name tf.get_collection is deprecated. Please use tf.compat.v1.get_collection instead.
+
+[[06/18/2025 09:21:29 AM]] From /app/model/tf_base_model.py:409: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+[[06/18/2025 09:21:29 AM]] From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/training/rmsprop.py:119: calling Ones.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
+Instructions for updating:
+Call initializer instance with the dtype argument instead of passing it to the constructor
+[[06/18/2025 09:21:30 AM]] all parameters:
+[[06/18/2025 09:21:30 AM]] From /app/model/tf_base_model.py:421: The name tf.global_variables is deprecated. Please use tf.compat.v1.global_variables instead.
+
+[[06/18/2025 09:21:30 AM]] [('Variable:0', []),
+ ('Variable_1:0', []),
+ ('Variable_2:0', []),
+ ('style_encoder/bidirectional/forward_lstm/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/forward_lstm/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/forward_lstm/bias:0', [512]),
+ ('style_encoder/bidirectional/backward_lstm/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/backward_lstm/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/backward_lstm/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121]),
+ ('style_encoder/bidirectional/forward_lstm/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/forward_lstm/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/forward_lstm/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/forward_lstm/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/forward_lstm/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/forward_lstm/bias/RMSProp_1:0', [512]),
+ ('style_encoder/bidirectional/backward_lstm/kernel/RMSProp:0', [3, 512]),
+ ('style_encoder/bidirectional/backward_lstm/kernel/RMSProp_1:0', [3, 512]),
+ ('style_encoder/bidirectional/backward_lstm/recurrent_kernel/RMSProp:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/backward_lstm/recurrent_kernel/RMSProp_1:0',
+  [128, 512]),
+ ('style_encoder/bidirectional/backward_lstm/bias/RMSProp:0', [512]),
+ ('style_encoder/bidirectional/backward_lstm/bias/RMSProp_1:0', [512]),
+ ('style_encoder/dense/kernel/RMSProp:0', [256, 1]),
+ ('style_encoder/dense/kernel/RMSProp_1:0', [256, 1]),
+ ('style_encoder/dense/bias/RMSProp:0', [1]),
+ ('style_encoder/dense/bias/RMSProp_1:0', [1]),
+ ('style_encoder/dense_1/kernel/RMSProp:0', [256, 256]),
+ ('style_encoder/dense_1/kernel/RMSProp_1:0', [256, 256]),
+ ('style_encoder/dense_1/bias/RMSProp:0', [256]),
+ ('style_encoder/dense_1/bias/RMSProp_1:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel/RMSProp_1:0',
+  [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights/RMSProp_1:0',
+  [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases/RMSProp_1:0',
+  [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel/RMSProp_1:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp:0',
+  [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias/RMSProp_1:0',
+  [1600]),
+ ('rnn_style/gmm/weights/RMSProp:0', [400, 121]),
+ ('rnn_style/gmm/weights/RMSProp_1:0', [400, 121]),
+ ('rnn_style/gmm/biases/RMSProp:0', [121]),
+ ('rnn_style/gmm/biases/RMSProp_1:0', [121])]
+[[06/18/2025 09:21:30 AM]] trainable parameters:
+[[06/18/2025 09:21:30 AM]] From /app/model/tf_base_model.py:424: The name tf.trainable_variables is deprecated. Please use tf.compat.v1.trainable_variables instead.
+
+[[06/18/2025 09:21:30 AM]] [('style_encoder/bidirectional/forward_lstm/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/forward_lstm/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/forward_lstm/bias:0', [512]),
+ ('style_encoder/bidirectional/backward_lstm/kernel:0', [3, 512]),
+ ('style_encoder/bidirectional/backward_lstm/recurrent_kernel:0', [128, 512]),
+ ('style_encoder/bidirectional/backward_lstm/bias:0', [512]),
+ ('style_encoder/dense/kernel:0', [256, 1]),
+ ('style_encoder/dense/bias:0', [1]),
+ ('style_encoder/dense_1/kernel:0', [256, 256]),
+ ('style_encoder/dense_1/bias:0', [256]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/kernel:0', [732, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/weights:0', [732, 30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/attention/biases:0', [30]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_1/bias:0', [1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/kernel:0',
+  [1132, 1600]),
+ ('rnn_style/StyleAdaptiveLSTMAttentionCell/lstm_cell_2/bias:0', [1600]),
+ ('rnn_style/gmm/weights:0', [400, 121]),
+ ('rnn_style/gmm/biases:0', [121])]
+[[06/18/2025 09:21:30 AM]] trainable parameter count:
+[[06/18/2025 09:21:30 AM]] 5070128
+[[06/18/2025 09:21:30 AM]] From /app/model/tf_base_model.py:450: The name tf.train.Saver is deprecated. Please use tf.compat.v1.train.Saver instead.
+
+[[06/18/2025 09:21:30 AM]] From /app/model/tf_base_model.py:460: The name tf.global_variables_initializer is deprecated. Please use tf.compat.v1.global_variables_initializer instead.
+
+[[06/18/2025 09:21:30 AM]] built graph
+[[06/18/2025 09:21:30 AM]] Restoring parameters from checkpoints/model-10900
+[[06/18/2025 09:26:10 AM]] Starting application on port 8080
+[[06/18/2025 09:26:10 AM]] Started server process [274]
+[[06/18/2025 09:26:10 AM]] Waiting for application startup.
+[[06/18/2025 09:26:10 AM]] Application startup complete.
+[[06/18/2025 09:26:10 AM]] [Errno 98] error while attempting to bind on address ('0.0.0.0', 8080): address already in use
+[[06/18/2025 09:26:10 AM]] Waiting for application shutdown.
+[[06/18/2025 09:26:10 AM]] Application shutdown complete.

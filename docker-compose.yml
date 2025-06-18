@@ -32,6 +32,7 @@ services:
       retries: 3
       start_period: 60s
     restart: unless-stopped
+    runtime: nvidia 
     deploy:
       resources:
         limits:
