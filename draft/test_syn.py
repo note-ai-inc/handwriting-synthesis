@@ -19,7 +19,7 @@ def test_model():
 
     model = StyleSynthesisModel(
         reader=reader,
-        log_dir="logs_style_synthesis",
+        # log_dir="logs_style_synthesis",  # Commented out to disable logging
         checkpoint_dir="checkpoints_style_synthesis",
         prediction_dir="predictions_style_synthesis",
         learning_rates=[1e-4],

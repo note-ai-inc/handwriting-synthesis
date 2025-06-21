@@ -410,6 +410,81 @@ def convert_word(request: WordRequest):
         # Clean and normalize the text
         text = request.text.strip()
         
+        # Check if reference style strokes were provided
+        ref_strokes = request.ref_strokes
+        
+        # If we have ref_strokes, perform quality check
+        if ref_strokes:
+            logging.info("Reference strokes provided, performing quality check")
+            
+            try:
+                # Create a test item for quality checking
+                test_item = {
+                    "index": 0,
+                    "line": text,
+                    "metadata": {
+                        "type": "paragraph", 
+                        "indent": 0, 
+                        "font_scale": 1.0,
+                        "spacing_before": 0.5,
+                        "spacing_after": 0.5
+                    },
+                    "bias": 0.75,
+                    "style": request.style_id,
+                    "stroke_width": 1,
+                    "stroke_color": "black"
+                }
+                
+                # Process test item with reference strokes
+                logging.info(f"Processing test word for quality check: '{text}'")
+                test_result = process_single_item(test_item, ref_strokes, 800, 600)
+                
+                # Create temporary image for quality check
+                temp_path = None
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                    temp_path = temp_file.name
+                
+                # Save test strokes to image
+                test_strokes = test_result["strokes"]
+                if test_strokes:
+                    logging.info(f"Saving {len(test_strokes)} test stroke groups for quality check")
+                    save_strokes_to_image(test_strokes, temp_path)
+                    
+                    # Check handwriting quality
+                    quality_check = check_handwriting_quality(temp_path)
+                    
+                    # Clean up the temporary file
+                    try:
+                        if os.path.exists(temp_path):
+                            os.unlink(temp_path)
+                            logging.debug(f"Cleaned up temporary file: {temp_path}")
+                    except Exception as e:
+                        logging.error(f"Error cleaning up temporary file {temp_path}: {e}")
+                    
+                    # If quality check fails, regenerate with default style (prevent recursion)
+                    if not quality_check:
+                        logging.info("Handwriting quality check FAILED on test word, regenerating with default style")
+                        fallback_request = WordRequest(
+                            text=request.text,
+                            style_id=request.style_id,
+                            ref_strokes=None  # Remove ref_strokes to prevent recursion
+                        )
+                        return convert_word(fallback_request)
+                    else:
+                        logging.info("Handwriting quality check PASSED on test word, proceeding with full generation")
+                else:
+                    logging.warning("No test strokes generated, proceeding with full generation")
+                    
+            except Exception as e:
+                logging.error(f"Error during test word quality check: {e}")
+                logging.info("Falling back to default style due to quality check error")
+                fallback_request = WordRequest(
+                    text=request.text,
+                    style_id=request.style_id,
+                    ref_strokes=None  # Remove ref_strokes to prevent recursion
+                )
+                return convert_word(fallback_request)
+        
         # Create a simple item for word processing
         item = {
             "index": 0,
