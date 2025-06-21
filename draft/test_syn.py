@@ -19,7 +19,7 @@ def test_model():
 
     model = StyleSynthesisModel(
         reader=reader,
-        log_dir="logs_style_synthesis",
+        # log_dir="logs_style_synthesis",  # Commented out to disable logging
         checkpoint_dir="checkpoints_style_synthesis",
         prediction_dir="predictions_style_synthesis",
         learning_rates=[1e-4],
@@ -41,7 +41,7 @@ def test_model():
         style_embedding_size=256
     )
 
-    checkpoint_path = "checkpoints/model-10350"
+    checkpoint_path = "checkpoints/model-10900"
     model.saver.restore(model.session, checkpoint_path)
 
     model.sampling_mode = "deterministic"
